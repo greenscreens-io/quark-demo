@@ -3,182 +3,148 @@
  */
 
 /**
- * Expose `Emitter`.
- */
-
-if (typeof module !== 'undefined') {
-	module.exports = Engine;
-}
-
-/**
  * Web and WebSocket API engine
  * Used to initialize remote API and remote services.
  */
-Engine = (() => {
+const ERROR_MESSAGE = 'Invalid definition for Engine Remote Service';
+const ERROR_API_UNDEFIEND = 'API Url not defined!';
+const ERROR_SVC_UNDEFIEND = 'Service Url not defined!';
 
-	const ERROR_MESSAGE = 'Invalid definition for Engine Remote Service';
+/**
+ * Main class for Quark Engine Client
+ */
+class Engine {
 
-	/**
-	 * Build Js Api from JSON definition retrieved from API service
-	 */
-	async function init(cfg) {
+	constructor(cfg) {
 
 		cfg = cfg || {};
 
 		if (!cfg.api) {
-			throw new Error('API Url not defined!');
+			throw new Error(ERROR_API_UNDEFIEND);
 		}
 
-		// remove all existing listeners
-		Generator.off('call');
-
-		// close socket if used
-		if (SocketChannel) {
-			SocketChannel.kill();
+		if (!cfg.service) {
+			throw new Error(ERROR_SVC_UNDEFIEND);
 		}
 
-		let isWSChannel = cfg.api === cfg.service && cfg.api.indexOf('ws') == 0;
+		let me = this;
 
-		if (isWSChannel) {
-			return await fromWebSocketChannel(cfg);
+		me.cfg = null;
+		me.isWSAPI = false;
+		me.isWebChannel = false;
+		me.isSockChannel = false;
+
+		me.Security = null;
+		me.Generator = null;
+		me.WebChannel = null;
+		me.SockChannel = null;
+
+		me.cfg = cfg;
+		me.isWSAPI = cfg.api === cfg.service && cfg.api.indexOf('ws') == 0;
+
+		me.isWebChannel = cfg.service.indexOf('http') === 0;
+		me.isSockChannel = cfg.service.indexOf('ws') === 0;
+
+		if ((me.isWebChannel || me.isSockChannel) === false) {
+			throw new Error(ERROR_MESSAGE);
 		}
 
-		await fromWebChannel(cfg);
-		let sts = await initService(cfg);
-		if (sts) return true;
+	}
 
-		throw new Error(ERROR_MESSAGE);
+	/*
+	 * Initialize engine, throws error,
+	 */
+	async init() {
+
+		let me = this;
+		if (me.isActive) return;
+
+		me.Security = new Security();
+		me.Generator = new Generator();
+
+		if (me.isWebChannel || me.isWSAPI == false) {
+			me.WebChannel = new WebChannel();
+			await me.WebChannel.init(me);
+		}
+
+		if (me.isSockChannel) {
+			me.SocketChannel = new SocketChannel();
+			await me.SocketChannel.init(me);
+		}
 
 	}
 
 	/**
-	 * Initialize API from WebSocket channel
-	 *
-	 * @param {Object} cfg
-	 * 		  Init configuration object with api and service url's
+	 * Use internaly from channel to register received
+	 * API definitiona and security data
 	 */
-	async function initService(cfg) {
+	async registerAPI(data) {
 
-		// if remote API defined
-		if (!cfg.service) return false;
-
-		// register HTTP/S channel for API
-		if (cfg.service.indexOf('http') === 0) {
-			await WebChannel.init(cfg.service);
-			return true;
-		}
-
-		// register WebSocket channel for API
-		if (cfg.service.indexOf('ws') === 0) {
-			await SocketChannel.init(cfg.service, cfg.wasm);
-			return true;
-		}
-
-		return false;
-
-	}
-
-	/**
-	 * Initialize API from WebSocket channel
-	 *
-	 * @param {Object} cfg
-	 * 		  Init configuration object with api and service url's
-	 */
-	function fromWebSocketChannel(cfg) {
-
-		return new Promise((resolve, reject) => {
-
-			var challenge = Date.now();
-
-			Generator.once('api', async (data) => {
-
-				data.challenge = challenge;
-				try {
-					await registerAPI(data);
-					resolve(true);
-				} catch (e) {
-					reject(e);
-				}
-
-			});
-
-			SocketChannel.init(cfg.service + '?q=' + challenge, cfg.wasm);
-
-			return null;
-		});
-
-	}
-
-	/**
-	 * Initialize API from HTTP/s channel
-	 *
-	 * @param {Object} cfg
-	 * 		  Init configuration object with api and service url's
-	 */
-	async function fromWebChannel(cfg) {
-		let data = await getAPI(cfg.api);
-		await registerAPI(data);
-	}
-
-	/**
-	 * Register callers from API definition
-	 *
-	 * @param {Object} data
-	 * 		  API definitions receive from server
-	 */
-	async function registerAPI(data) {
+		let me = this;
 
 		// initialize encryption if provided
 		if (data.signature) {
-			if (!Security.isActive()) {
-				await Security.init(data);
+			if (!me.Security.isActive) {
+				await me.Security.init(data);
 			}
 		}
 
-		Generator.build(data.api);
+		me.Generator.build(data.api);
 	}
 
 	/**
-	 * Get API definition through HTTP/s channel
-	 *
-	 * @param {String} url
-	 * 		  URL Address for API service definitions
+	 * Stop engine instance by clearing all references
+	 * stoping listeners, stoping socket is avaialble
 	 */
-	async function getAPI(url) {
+	stop() {
 
-		let app = location.pathname.split('/')[1];
-		let service = url ? url : (location.origin + `/${app}/api`);
-		let id = Date.now();
+		let me = this;
 
-		let resp = await fetch(service, {
-			method: 'get',
-			headers: {
-				'x-time': id
-			}
-		});
-		let data = await resp.json();
+		if (me.WebChannel) me.WebChannel.stop();
+		if (me.SocketChannel) me.SocketChannel.stop();
+		if (me.Generator) me.Generator.stop();
 
-		// update local challenge for signature verificator
-		data.challenge = id.toString();
-
-		return data;
-
+		me.WebChannel = null;
+		me.SocketChannel = null;
+		me.Generator = null;
+		me.Security = null;
+		me.cfg = null;
 	}
 
-	/**
-	 * Exported object with external methods
+	/*
+	 * Return generated API
 	 */
-	var exported = {
+	get api() {
+		return this.Generator ? this.Generator.api : null;
+	}
 
-		init: function(cfg) {
-			return init(cfg);
-		}
+	/*
+	 * Check if engine is active
+	 */
+	get isActive() {
+		return this.api && this.Security;
+	}
 
-	};
+	/*
+	 * Return API URL address
+	 */
+	get apiURL() {
+		return this.cfg ? this.cfg.api : null;
+	}
 
-	Emitter(exported);
-	Object.freeze(exported);
+	/*
+	 * Return Service URL address
+	 */
+	get serviceURL() {
+		return this.cfg ? this.cfg.service : null;
+	}
 
-	return exported;
-
-})();
+	/*
+	 * Static instance builder
+	 */
+	static async init(cfg) {
+		let engine = new Engine(cfg);
+		await engine.init();
+		return engine;
+	}
+}

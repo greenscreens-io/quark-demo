@@ -3,19 +3,53 @@
  */
 
 /**
- * Expose `Emitter`.
- */
-
-if (typeof module !== 'undefined') {
-	module.exports = Generator;
-}
-
-/**
  * Web and WebSocket API engine
  * Used to call remote services.
  * All Direct functions linked to defiend namespace
  */
-Generator = (() => {
+class Generator extends Events {
+
+	constructor() {
+		super();
+		this._model = {};
+	}
+
+	/**
+	 * Return generted API structure and callers
+	 */
+	get api() {
+		return this._model;
+	}
+
+	/**
+	 * Disconnect generator from API callers
+	 */
+	stop() {
+
+		let me = this;
+		me.removeAllListeners('call');
+		me.removeAllListeners('api');
+		me.detach();
+	}
+
+	/**
+	 * Detach generated API namespace from global
+	 */
+	detach() {
+		let me = this;
+		let root = typeof global === 'undefined' ? self : global;
+		Object.keys(me._model).forEach(v => root[v] = null);
+		me._model = {};
+	}
+
+	/**
+	 * Attach generated API namespace to global
+	 */
+	attach() {
+		let me = this;
+		let root = typeof global === 'undefined' ? self : global;
+		Object.entries(me._model).forEach(v => root[v[0]] = v[1]);
+	}
 
 	/**
 	 * Build JS object with callable functions that maps to Java side methods
@@ -24,9 +58,15 @@ Generator = (() => {
 	 * @param {String} url || api object
 	 * 		  URL Address for API service definitions
 	 */
-	async function build(o) {
-		let data = o.api || o;
-		buildAPI(data);
+	build(o) {
+
+		let me = this;
+		let data = o ? o.api || o : null;
+
+		if (!data) return data;
+		me._buildAPI(data);
+		me.attach();
+
 		return data;
 	}
 
@@ -37,15 +77,17 @@ Generator = (() => {
 	 * @param {Object} cfg
 	 * 		Alternative definition to API
 	 */
-	function buildAPI(cfg) {
+	_buildAPI(cfg) {
+
+		let me = this;
 
 		if (Array.isArray(cfg)) {
 			cfg.every(v => {
-				buildInstance(v);
+				me._buildInstance(v);
 				return true;
 			});
 		} else {
-			buildInstance(cfg);
+			me._buildInstance(cfg);
 		}
 
 	}
@@ -56,12 +98,13 @@ Generator = (() => {
 	 * @param {Object} api
 	 * 		  Java Class/Method definition
 	 */
-	function buildInstance(api) {
+	_buildInstance(api) {
 
+		let me = this;
 		let tree = null;
 		let action = null;
 
-		tree = buildNamespace(api.namespace);
+		tree = me._buildNamespace(api.namespace);
 
 		if (!tree[api.action]) {
 			tree[api.action] = {};
@@ -69,7 +112,7 @@ Generator = (() => {
 		action = tree[api.action];
 
 		api.methods.every(v => {
-			buildMethod(api.namespace, api.action, action, v);
+			me._buildMethod(api.namespace, api.action, action, v);
 			return true;
 		});
 	}
@@ -83,18 +126,19 @@ Generator = (() => {
 	 * @return {Object}
 	 * 			Object tree structure
 	 */
-	function buildNamespace(namespace) {
+	_buildNamespace(namespace) {
 
+		let me = this;
 		let tmp = null;
 
 		namespace.split('.').every(v => {
 
 			if (!tmp) {
-				if (!window[v]) window[v] = {};
-				tmp = window[v];
+				if (!me._model[v]) me._model[v] = {};
+				tmp = me._model[v];
 			} else {
 				if (!tmp[v]) tmp[v] = {};
-				Object.freeze(tmp);
+				// Object.freeze(tmp);
 				tmp = tmp[v];
 			}
 
@@ -112,7 +156,7 @@ Generator = (() => {
 	 * @param {String} instance
 	 * @param {Array} api
 	 */
-	function buildMethod(namespace, action, instance, api) {
+	_buildMethod(namespace, action, instance, api) {
 
 		let enc = api.encrypt === false ? false : true;
 		let cfg = {
@@ -123,8 +167,8 @@ Generator = (() => {
 			e: enc
 		};
 
-		instance[api.name] = apiFn(cfg);
-		Object.freeze(instance[api.name]);
+		instance[api.name] = this._apiFn(cfg);
+		// Object.freeze(instance[api.name]);
 	}
 
 	/**
@@ -132,8 +176,9 @@ Generator = (() => {
 	 *
 	 * @param {Array} params List of arguments from caller
 	 */
-	function apiFn(params) {
+	_apiFn(params) {
 
+		let me = this;
 		let prop = params;
 
 		function fn() {
@@ -151,8 +196,8 @@ Generator = (() => {
 			};
 
 			promise = new Promise((resolve, reject) => {
-				exported.emit('call', req, (err, obj) => {
-					onResponse(err, obj, prop, resolve, reject);
+				me.emit('call', req, (err, obj) => {
+					me._onResponse(err, obj, prop, resolve, reject);
 				});
 			});
 
@@ -165,7 +210,7 @@ Generator = (() => {
 	/**
 	 * Process remote response
 	 */
-	function onResponse(err, obj, prop, response, reject) {
+	_onResponse(err, obj, prop, response, reject) {
 
 		if (err) {
 			reject(err);
@@ -183,22 +228,15 @@ Generator = (() => {
 			reject(obj.result || obj);
 		}
 
-	};
+	}
 
 	/**
-	 * Exported object with external methods
+	 * Static instance builder
 	 */
-	var exported = {
+	static async build(cfg) {
+		let generator = new Generator();
+		generator.build(cfg);
+		return generator;
+	}
 
-		build: function(cfg) {
-			return build(cfg);
-		}
-
-	};
-
-	Emitter(exported);
-	Object.freeze(exported);
-
-	return exported;
-
-})();
+}

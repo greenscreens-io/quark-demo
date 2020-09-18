@@ -3,28 +3,27 @@
  */
 
 /**
- * Expose `Emitter`.
- */
-
-if (typeof module !== 'undefined') {
-	module.exports = Security;
-}
-
-/**
  * Security engine using Web Crypto API to encrypt / decrypt
  * messages between browser and server.
  *
  * Received RSA public key is signed and verified at the
  * browser side to prevent tampering
  */
-Security = (() => {
 
-	var VERSION = 0;
-	var encKEY = null;
-	var aesKEY = null;
-	var exportedAES = null;
+class Security {
 
-	const Encoder = new TextEncoder();
+	constructor() {
+
+		let me = this;
+		me.VERSION = 0;
+		me.encKEY = null;
+		me.aesKEY = null;
+		me.exportedAES = null;
+
+		me.encoder = new TextEncoder();
+		me.decoder = new TextDecoder();
+
+	}
 
 	/**
 	 *  Use local challenge, to verify received data signature
@@ -32,9 +31,10 @@ Security = (() => {
 	 *  @param {Object} cfg
 	 *      Data received from server contins public key and signature
 	 */
-	function getChallenge(cfg) {
+	getChallenge(cfg) {
 		return [cfg.challenge || '', cfg.keyEnc || '', cfg.keyVer || ''].join('');
 	}
+
 
 	/**
 	 * Create random bytes
@@ -42,9 +42,9 @@ Security = (() => {
 	 * @param {int} size
 	 *     length of data (required)
 	 */
-	function getRandom(size) {
+	getRandom(size) {
 		let array = new Uint8Array(size);
-		window.crypto.getRandomValues(array);
+		crypto.getRandomValues(array);
 		return array;
 	}
 
@@ -52,13 +52,13 @@ Security = (() => {
 	 * Create AES key for data encryption
 	 * @returns CryptoKey
 	 */
-	async function generateAesKey() {
+	async generateAesKey() {
 		let type = {
 			name: "AES-CTR",
 			length: 128
 		};
 		let mode = ["encrypt", "decrypt"];
-		return window.crypto.subtle.generateKey(type, true, mode);
+		return crypto.subtle.generateKey(type, true, mode);
 	}
 
 	/**
@@ -66,8 +66,8 @@ Security = (() => {
 	 * @param {CryptoKey} key
 	 * @returns Uin8Array
 	 */
-	async function exportAesKey(key) {
-		let buffer = await window.crypto.subtle.exportKey("raw", key);
+	async exportAesKey(key) {
+		let buffer = await crypto.subtle.exportKey("raw", key);
 		return new Uint8Array(buffer);
 	}
 
@@ -85,12 +85,11 @@ Security = (() => {
 	 * @param {String} mode
 	 *          Key usage 'encrypt' or 'decrypt'
 	 */
-	async function importRsaKey(key, type, mode) {
+	async importRsaKey(key, type, mode) {
 
-		let binaryDerString = window.atob(key);
-		let binaryDer = str2ab(binaryDerString);
+		let binaryDer = Buffer.from(key, 'base64');
 
-		return window.crypto.subtle.importKey(
+		return crypto.subtle.importKey(
 			"spki",
 			binaryDer,
 			type,
@@ -111,10 +110,12 @@ Security = (() => {
 	 * @param {ArrayBuffer} challenge
 	 *        Challenge to verify with signature (ts + pemENCDEC + pemVERSGN)
 	 */
-	async function verify(key, signature, challenge) {
+	async verify(key, signature, challenge) {
 
-		let binSignature = str2ab(atob(signature));
-		let binChallenge = Encoder.encode(challenge);
+		let me = this;
+		let binSignature = Buffer.from(signature, 'base64');
+		let binChallenge = me.encoder.encode(challenge);
+
 		let type = {
 			name: "ECDSA",
 			hash: {
@@ -122,7 +123,7 @@ Security = (() => {
 			}
 		};
 
-		return window.crypto.subtle.verify(
+		return crypto.subtle.verify(
 			type,
 			key,
 			binSignature,
@@ -136,17 +137,18 @@ Security = (() => {
 	 * @param {String || ArrayBuffer} data
 	 *        String or AraryBuffer to encrypt
 	 */
-	async function encryptRSA(data) {
+	async encryptRSA(data) {
 
+		let me = this;
 		let encoded = data;
 
 		if (typeof data === 'string') {
-			encoded = Encoder.encode(data);
+			encoded = me.encoder.encode(data);
 		}
 
-		return window.crypto.subtle.encrypt(
+		return crypto.subtle.encrypt(
 			"RSA-OAEP",
-			encKEY,
+			me.encKEY,
 			encoded
 		);
 	}
@@ -154,80 +156,80 @@ Security = (() => {
 	/**
 	 * Encrypt message with AES
 	 */
-	async function encryptAesMessage(key, iv, data) {
+	async encryptAesMessage(key, iv, data) {
 
-		let encoded = Encoder.encode(data);
+		let encoded = this.encoder.encode(data);
 		let type = {
 			name: "AES-CTR",
 			counter: iv,
 			length: 128
 		};
 
-		return window.crypto.subtle.encrypt(type, key, encoded);
+		return crypto.subtle.encrypt(type, key, encoded);
 	}
 
 	/**
 	 * Decrypt AES encrypted message
 	 */
-	async function decryptAesMessage(key, iv, data) {
+	async decryptAesMessage(key, iv, data) {
 
-		let databin = hex2ab(data);
-		let ivbin = hex2ab(iv);
+		let databin = Buffer.from(data, "hex");
+		let counter = Buffer.from(iv, "hex");
 
-		let counter = new Uint8Array(ivbin);
-		let dataArray = new Uint8Array(databin);
 		let type = {
 			name: "AES-CTR",
 			counter: counter,
 			length: 128
 		};
 
-		return window.crypto.subtle.decrypt(type, key, dataArray);
+		return crypto.subtle.decrypt(type, key, databin);
 	}
 
-	function isValid() {
-		return encKEY !== null && aesKEY !== null;
+	get isValid() {
+		let me = this;
+		return me.encKEY !== null && me.aesKEY !== null;
 	}
 
-	function isAvailable() {
-		return window.crypto.subtle != null;
+	static get isAvailable() {
+		return crypto.subtle != null;
 	}
-
-	/********************************************************************/
-	/*                   P U B L I C  F U N C T I O N S                 */
-	/********************************************************************/
 
 	/**
 	 * Initialize encryption and verification keys
 	 * Verifies data signatures to prevent tampering
 	 */
-	async function init(cfg) {
+	async init(cfg) {
 
-		if (!window.crypto.subtle) {
+		let me = this;
+
+		if (!Security.isAvailable) {
 			console.log('Security mode not available, TLS protocol required.');
 			return;
 		}
 
 		console.log('Security Initializing...');
 
-		VERSION++;
-		encKEY = await importRsaKey(cfg.keyEnc, {
+		me.VERSION++;
+
+		me.encKEY = await me.importRsaKey(cfg.keyEnc, {
 			name: 'RSA-OAEP',
 			hash: 'SHA-256'
 		}, 'encrypt');
-		aesKEY = await generateAesKey();
-		exportedAES = await exportAesKey(aesKEY);
 
-		let verKey = await importRsaKey(cfg.keyVer, {
+		me.aesKEY = await me.generateAesKey();
+		me.exportedAES = await me.exportAesKey(me.aesKEY);
+
+		let verKey = await me.importRsaKey(cfg.keyVer, {
 			name: 'ECDSA',
 			namedCurve: "P-384"
 		}, 'verify');
-		let status = await verify(verKey, cfg.signature, getChallenge(cfg || {}));
+
+		let status = await me.verify(verKey, cfg.signature, me.getChallenge(cfg || {}));
 
 		if (!status) {
-			encKEY = null;
-			aesKEY = null;
-			exportedAES = null;
+			me.encKEY = null;
+			me.aesKEY = null;
+			me.exportedAES = null;
 			throw new Error('Signature invalid');
 		}
 
@@ -240,16 +242,18 @@ Security = (() => {
 	 * @param
 	 * 		data  - string to encrypt
 	 */
-	async function encrypt(data, bin) {
+	async encrypt(data, bin) {
 
-		let iv = getRandom(16);
-		let key = new Uint8Array(iv.length + exportedAES.length);
+		let me = this;
+		let iv = me.getRandom(16);
+		let key = new Uint8Array(iv.length + me.exportedAES.length);
 
 		key.set(iv);
-		key.set(exportedAES, iv.length);
+		key.set(me.exportedAES, iv.length);
 
-		let encryptedKey = await encryptRSA(key);
-		let encryptedData = await encryptAesMessage(aesKEY, iv, data);
+		let str = (typeof data === 'string') ? data : JSON.stringify(data);
+		let encryptedKey = await me.encryptRSA(key);
+		let encryptedData = await me.encryptAesMessage(me.aesKEY, iv, str);
 
 		if (bin === true) {
 			return {
@@ -257,9 +261,10 @@ Security = (() => {
 				k: encryptedKey
 			};
 		}
+
 		return {
-			d: buf2hex(encryptedData),
-			k: buf2hex(encryptedKey)
+			d: Buffer.to(encryptedData, 'hex'),
+			k: Buffer.to(encryptedKey, 'hex')
 		};
 
 	}
@@ -273,15 +278,16 @@ Security = (() => {
 	 * 		cfg.k - aes IV used for masking
 	 *
 	 */
-	async function decrypt(cfg) {
+	async decrypt(cfg) {
 
+		let me = this;
 		let iv = cfg.iv;
 		let data = cfg.d;
 
-		let message = await decryptAesMessage(aesKEY, iv, data);
+		let message = await me.decryptAesMessage(me.aesKEY, iv, data);
 
-		var str = stringFromUTF8Array(new Uint8Array(message));
-		var obj = JSON.parse(str);
+		let str = me.decoder.decode(message);
+		let obj = JSON.parse(str);
 
 		if (obj && obj.type == 'ws' && obj.cmd === 'data') {
 			obj = obj.data;
@@ -290,32 +296,10 @@ Security = (() => {
 		return obj;
 	}
 
-	/**
-	 * Exported object with external methods
-	 */
-	const exported = {
+	static async init(cfg) {
+		let security = new Security();
+		await security.init(cfg);
+		return security;
+	}
 
-		isAvailable: function() {
-			return isAvailable();
-		},
-
-		isActive: function() {
-			return isValid();
-		},
-
-		init: function(cfg) {
-			return init(cfg);
-		},
-
-		encrypt: function(cfg, bin) {
-			return encrypt(cfg, bin);
-		},
-
-		decrypt: function(cfg) {
-			return decrypt(cfg);
-		}
-	};
-	Object.freeze(exported);
-
-	return exported;
-})();
+};

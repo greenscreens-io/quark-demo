@@ -2,54 +2,49 @@
  * Copyright (C) 2015, 2020  Green Screens Ltd.
  */
 
-/**
- * Expose `Emitter`.
- */
-
-if (typeof module !== 'undefined') {
-  module.exports = SocketChannel;
-}
 
 /**
  * Web and WebSocket API engine
  * Used to call remote services.
  * All Direct functions linked to io.greenscreens namespace
  */
-SocketChannel = (() => {
+class SocketChannel {
 
-	const Decoder = new TextDecoder();
-	const Encoder = new TextEncoder();
+	constructor() {
 
-	var tid = 0;
-	var queue = {
-		up: 0,
-		down: 0
-	};
+		let me = this;
 
-	var webSocket = null;
-
-	/**
-	 * Update coutners and queue to link resposnes to requests
-	 * @param {Object} req
-	 *      Request data
-	 */
-	function updateRequest(req, callback) {
-		tid++;
-		req.tid = tid.toString();
-		queue[req.tid] = callback;
-		queue.up++;
+		me.queue = new Queue();
+		me.webSocket = null;
+		me.engine = null;
 	}
 
 	/**
-	 * Rerset queue to remove old staleld elements
+	 * Initialize Socket channel
 	 */
-	function cleanQueue() {
-		if (queue.up > 50 && queue.down >= queue.up) {
-			queue = {
-				up: 0,
-				down: 0
-			};
-		}
+	async init(engine) {
+
+		let me = this;
+		me.stop();
+		me.engine = engine;
+
+		return new Promise((resolve, reject) => {
+			me._startSocket(resolve, reject);
+			return null;
+		});
+
+	}
+
+	/**
+	 * Close WebSocket channel if available
+	 */
+	stop() {
+		let me = this;
+		if (me.webSocket == null) return false;
+		me.webSocket.close();
+		me.webSocket = null;
+		me.engine = null;
+		return true;
 	}
 
 	/**
@@ -57,9 +52,9 @@ SocketChannel = (() => {
 	 *
 	 * @param {Object} req
 	 */
-	function canEncrypt(req) {
+	canEncrypt(req) {
 		let hasArgs = Array.isArray(req.data) && req.data.length > 0 && req.e !== false;
-		return Security.isActive() && hasArgs;
+		return this.engine.Security.isValid && hasArgs;
 	}
 
 	/**
@@ -68,37 +63,90 @@ SocketChannel = (() => {
 	 * @param {Object} req
 	 *         Data to send (optionaly encrypt)
 	 */
-	async function onCall(req, callback) {
+	async onCall(req, callback) {
 
+		let me = this;
 		let msg = null;
 		let enc = null;
 		let data = null;
-		let verb = 'data';
 
-		let isEncrypt = canEncrypt(req);
+		let isEncrypt = me.canEncrypt(req);
 
-		updateRequest(req, callback);
+		me.queue.updateRequest(req, callback);
 
 		// encrypt if supported
 		if (isEncrypt) {
-			enc = await Security.encrypt(JSON.stringify(req.data));
+			enc = await me.engine.Security.encrypt(req.data);
 			req.data = [enc];
-			verb = 'enc';
 		}
 
 		data = {
-			cmd: verb,
+			cmd: isEncrypt ? 'enc' : 'data',
 			type: 'ws',
 			data: [req]
 		};
+
 		msg = JSON.stringify(data);
 
-		if (!Streams.isAvailable()) {
-			return webSocket.send(msg);
+		if (!Streams.isAvailable) {
+			return me.webSocket.send(msg);
 		}
 
 		msg = await Streams.compress(msg);
-		webSocket.send(msg);
+		me.webSocket.send(msg);
+	}
+
+	async _startSocket(resolve, reject) {
+
+		let me = this;
+		let engine = me.engine;
+		let generator = engine.Generator;
+
+		let challenge = Date.now();
+		let url = engine.serviceURL + '?q=' + challenge;
+
+		me.webSocket = new WebSocket(url, ['ws4is']);
+		me.webSocket.binaryType = "arraybuffer";
+
+		let onCall = me.onCall.bind(me);
+
+		me.webSocket.onopen = (event) => {
+
+			generator.on('call', onCall);
+
+			if (!engine.isWSAPI) {
+				return resolve(true);
+			}
+
+			generator.once('api', async (data) => {
+
+				try {
+					data.challenge = challenge;
+					await engine.registerAPI(data);
+					resolve(true);
+				} catch (e) {
+					reject(e);
+				}
+
+			});
+
+		};
+
+		me.webSocket.onclose = (event) => {
+			generator.off('call', onCall);
+			me.stop();
+		}
+
+		me.webSocket.onerror = (event) => {
+			generator.off('call', onCall);
+			reject(event);
+			me.stop();
+		};
+
+		me.webSocket.onmessage = (event) => {
+			me._prepareMessage(event.data);
+		};
+
 	}
 
 	/**
@@ -107,9 +155,13 @@ SocketChannel = (() => {
 	 * @param {String} mesasge
 	 *
 	 */
-	async function prepareMessage(message) {
+	async _prepareMessage(message) {
 
+		let me = this;
 		let obj = null;
+
+		let engine = me.engine;
+		let generator = engine.Generator;
 
 		try {
 
@@ -123,13 +175,13 @@ SocketChannel = (() => {
 			}
 
 			if (obj) {
-				onMessage(obj);
+				me.onMessage(obj);
 			} else {
-				Generator.emit('error', event);
+				generator.emit('error', event);
 			}
 
 		} catch (e) {
-			Generator.emit('error', e);
+			generator.emit('error', e);
 		}
 
 	}
@@ -140,168 +192,39 @@ SocketChannel = (() => {
 	 * @param {*} msg
 	 *
 	 */
-	async function onMessage(obj) {
+	async onMessage(obj) {
 
+		let me = this;
 		let data = null;
 
+		let engine = me.engine;
+		let generator = engine.Generator;
+		let security = engine.Security;
+
 		if (obj.cmd === 'api') {
-			return Generator.emit('api', obj.data);
+			return generator.emit('api', obj.data);
 		}
 
 		if (obj.cmd === 'err') {
-			return Generator.emit('error', obj.result);
-		}
-
-		if (obj.cmd === 'data') {
-			obj = obj.data;
-			return doData(obj);
+			return generator.emit('error', obj.result);
 		}
 
 		if (obj.cmd === 'enc') {
-
-			data = await Security.decrypt(obj);
-
-			if (data) {
-			  return doData(data);
+			if (Security.isAvailable) {
+				data = await security.decrypt(obj);
+			} else {
+				return generator.emit('error', new Error('Security available on https/wss only'));
 			}
-
 		}
 
-		Engine.emit('message', obj);
-	}
-
-	/**
-	 * Process multiple records in a single response
-	 *
-	 * @param {Object || Array} obj
-	 *
-	 */
-	function doData(obj) {
-
-		if (Array.isArray(obj)) {
-
-			obj.every(o => {
-				onData(o);
-				return true;
-			});
-
-		} else {
-
-			onData(obj);
-
-		}
-	}
-
-	/**
-	 * Process single response record
-	 *
-	 * @param {Object} obj
-	 */
-	function onData(obj) {
-
-		queue.down++;
-
-		if (typeof queue[obj.tid] === 'function') {
-			try {
-				queue[obj.tid](null, obj);
-			} finally {
-				queue[obj.tid] = null;
-			}
-		} else {
-			Engine.emit('message', obj);
+		if (obj.cmd === 'data') {
+			data = obj.data;
 		}
 
-		cleanQueue();
-
-	};
-
-	/**
-	 * Initialize API call listener
-	 */
-	function listener(req, callback) {
-
-		onCall(req, callback)
-			.catch((e) => {
-				callback(e, null);
-			});
-	}
-
-	/**
-	 * If wss used in url, create WebSocket channel to
-	 * exchange API messages
-	 */
-	async function startSocket(url, wasm, resolve, reject) {
-
-		webSocket = new WebSocket(url, ['ws4is']);
-		webSocket.binaryType = "arraybuffer";
-
-		webSocket.onopen = function(event) {
-			Generator.on('call', listener);
-			resolve(true);
-		};
-
-		webSocket.onclose = function(event) {
-			Generator.off('call', listener);
-			webSocket = null;
-			Engine.emit('offline');
+		if (data) {
+			me.queue.process(data);
 		}
-
-		webSocket.onerror = function(event) {
-			Generator.off('call', listener);
-			reject(event);
-			Generator.emit('error', event);
-			webSocket = null;
-		};
-
-		webSocket.onmessage = function(event) {
-			prepareMessage(event.data);
-		};
 
 	}
 
-	/**
-	 * Initialize Socket channel
-	 * @param {String} url
-	 *      WebSocket Service URL
-	 */
-	function init(url, wasm) {
-
-		kill();
-
-		return new Promise((resolve, reject) => {
-			startSocket(url, wasm, resolve, reject);
-			return null;
-		});
-
-	}
-
-	/**
-	 * Close WebSocket channel if available
-	 */
-	function kill() {
-		if (webSocket !== null) {
-			webSocket.close();
-			webSocket = null;
-		}
-	}
-
-	/**
-	 * Exported object with external methods
-	 */
-	var exported = {
-
-		init: function(url, wasm) {
-			return init(url, wasm);
-		},
-
-		kill: function() {
-			return kill();
-		}
-
-	};
-
-	Object.freeze(exported);
-
-	return exported;
-
-})();
+};
