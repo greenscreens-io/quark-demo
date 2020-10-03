@@ -25,11 +25,11 @@ import com.ibm.as400.access.SpooledFileList;
 import io.greenscreens.demo.DemoURLConstants;
 import io.greenscreens.demo1.Authenticated;
 import io.greenscreens.demo1.SystemI;
-import io.greenscreens.ext.ExtJSResponse;
-import io.greenscreens.ext.ExtJSResponseList;
-import io.greenscreens.ext.annotations.ExtJSAction;
-import io.greenscreens.ext.annotations.ExtJSDirect;
-import io.greenscreens.ext.annotations.ExtJSMethod;
+import io.greenscreens.quark.ext.ExtJSResponse;
+import io.greenscreens.quark.ext.ExtJSResponseList;
+import io.greenscreens.quark.ext.annotations.ExtJSAction;
+import io.greenscreens.quark.ext.annotations.ExtJSDirect;
+import io.greenscreens.quark.ext.annotations.ExtJSMethod;
 
 /**
  * Example controller class to work with OUTQ's
