@@ -1,6 +1,12 @@
 
 # [Quark Engine DEMO](https://www.greenscreens.io/quark).
 
+![Compile](https://github.com/greenscreens-io/quark-java/workflows/Compile/badge.svg?branch=master)
+![GitHub](https://img.shields.io/github/license/greenscreens-io/quark-java?style=plastic)
+
+![GitHub Last Commit](https://img.shields.io/github/last-commit/greenscreens-io/quark-java?style=plastic)
+![GitHub Release Date](https://img.shields.io/github/release-date/greenscreens-io/quark-java?style=plastic)
+
 Visit project web page [here](https://www.greenscreens.io/quark).
 
 The is small Java web app for testing Quark Engine.
