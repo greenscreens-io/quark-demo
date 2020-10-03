@@ -5,7 +5,7 @@
 ![GitHub](https://img.shields.io/github/license/greenscreens-io/quark-demo?style=plastic)
 
 ![GitHub Last Commit](https://img.shields.io/github/last-commit/greenscreens-io/quark-demo?style=plastic)
-![GitHub Release Date](https://img.shields.io/github/release-date/greenscreens-io/quark-demo?style=plastic)
+
 
 Visit project web page [here](https://www.greenscreens.io/quark).
 
