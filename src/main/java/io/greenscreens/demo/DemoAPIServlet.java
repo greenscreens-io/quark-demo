@@ -4,13 +4,14 @@
 package io.greenscreens.demo;
 
 import javax.servlet.annotation.WebServlet;
-import io.greenscreens.quark.web.APIServlet;
+
+import io.greenscreens.quark.web.QuarkAPIServlet;
 
 /**
  * Servlet to render API structure
  */
 @WebServlet(DemoURLConstants.API)
-public class DemoAPIServlet extends APIServlet {
+public class DemoAPIServlet extends QuarkAPIServlet {
 
 	private static final long serialVersionUID = 1L;
 

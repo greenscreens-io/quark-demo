@@ -1,4 +1,4 @@
-/* Quark Engine v2.1.0 (c) Green Screens Ltd. */
+/* Quark Engine v2.2.0 (c) Green Screens Ltd. */
 
 /*
  * Copyright (C) 2015, 2020  Green Screens Ltd.
@@ -565,12 +565,14 @@ class Security {
 
 		if (bin === true) {
 			return {
+				t:'1',
 				d: encryptedData,
 				k: encryptedKey
 			};
 		}
 
 		return {
+			t:'1',
 			d: Buffer.to(encryptedData, 'hex'),
 			k: Buffer.to(encryptedKey, 'hex')
 		};
