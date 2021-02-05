@@ -30,7 +30,7 @@ class WebChannel {
 	}
 
 	/**
-	 * Disengage listeneres and links
+	 * Disengage listeners and links
 	 */
 	stop() {
 
@@ -118,13 +118,13 @@ class WebChannel {
 
 
 	/**
-	 * Prepare remtoe call, encrypt if avaialble
+	 * Prepare remote call, encrypt if available
 	 *
 	 * @param {String} url
 	 *        Service URL to receive data
 	 *
 	 * @param {Object} req
-	 *         Data to sen (optionaly encrypt)
+	 *         Data to send (optionally encrypt)
 	 */
 	async onCall(engine, req) {
 
