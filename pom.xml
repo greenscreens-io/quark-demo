@@ -54,17 +54,19 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>io.greenscreens.jt400</groupId>
+			<groupId>io.greenscreens</groupId>
 			<artifactId>jt400-extra</artifactId>
 			<version>1.2.1</version>
-			<scope>provided</scope>
+			<scope>system</scope>
+			<systemPath>${basedir}/src/main/webapp/WEB-INF/lib/jt400-extra-1.2.1.jar</systemPath>
 		</dependency>
 
 		<dependency>
-			<groupId>io.greenscreens.quark</groupId>
+			<groupId>io.greenscreens</groupId>
 			<artifactId>quark</artifactId>
-			<version>3.0.0</version>
-			<scope>provided</scope>
+			<version>2.1.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/src/main/webapp/WEB-INF/lib/quark-3.0.0.jar</systemPath>
 		</dependency>
 
 		<dependency>
