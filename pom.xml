@@ -57,7 +57,7 @@
 			<groupId>io.greenscreens.jt400</groupId>
 			<artifactId>jt400-extra</artifactId>
 			<version>1.2.1</version>
-			<scope>provided</>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
