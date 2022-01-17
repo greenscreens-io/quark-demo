@@ -192,7 +192,7 @@ async function test7() {
 	try {
 		let i = 10;
 		while (i--) {
-			let data = await io.greenscreens.Demo.hello('John Doe call: ' + i);
+			const data = await io.greenscreens.Demo.hello('John Doe call: ' + i);
 			console.log(data);
 		}
 	} finally {
@@ -215,6 +215,7 @@ async function test8() {
 	try {
 		let i = 10;
 		while (i--) {
+			const data = await io.greenscreens.Demo.hello('John Doe call: ' + i);
 			console.log(data);
 		}
 	} finally {
