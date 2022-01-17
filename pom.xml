@@ -64,7 +64,7 @@
 			<groupId>io.greenscreens.quark</groupId>
 			<artifactId>quark</artifactId>
 			<version>3.0.0</version>
-			<scope>provided</>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
