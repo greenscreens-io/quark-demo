@@ -38,14 +38,14 @@ class SocketChannel extends Events {
 	get isOpen() {
 		const me = this;
 		if (me.webSocket == null) return false;
-		return me.webSocket.readyState === me.webSocket.OPEN;		
+		return me.webSocket.readyState === me.webSocket.OPEN;
 	}
 
 	/**
 	 * Close WebSocket channel if available
 	 */
 	stop() {
-		let me = this;
+		const me = this;
 		if (me.webSocket == null) return false;
 		me.webSocket.close();
 		me.webSocket = null;
@@ -73,8 +73,6 @@ class SocketChannel extends Events {
 
 		const me = this;
 		let msg = null;
-		let enc = null;
-		let data = null;
 
 		const isEncrypt = me.canEncrypt(req);
 
@@ -82,11 +80,11 @@ class SocketChannel extends Events {
 
 		// encrypt if supported
 		if (isEncrypt) {
-			enc = await me.engine.Security.encrypt(req.data);
+			const enc = await me.engine.Security.encrypt(req.data);
 			req.data = [enc];
 		}
 
-		data = {
+		const data = {
 			cmd: isEncrypt ? 'enc' : 'data',
 			type: 'ws',
 			data: [req]
@@ -110,8 +108,8 @@ class SocketChannel extends Events {
 
 		const challenge = Date.now();
 		const url = new URL(engine.serviceURL);
-		
-		let headers = Object.assign({}, engine.headers || {});
+
+		const headers = Object.assign({}, engine.headers || {});
 		headers.q = challenge;
 		headers.c = Streams.isAvailable;
 		
@@ -197,14 +195,14 @@ class SocketChannel extends Events {
 
 			const msg = text.trim();
 			const isJSON = me._isJsonObj(msg) || me._isJsonArray(msg); 
+
 			if (isJSON) {
 				obj = JSON.parse(text);
 				me.onMessage(obj);				
 			} else {
 				generator.emit('raw', text);	
 			}
-			
-			
+
 		} catch (e) {
 			generator.emit('error', e);
 		}

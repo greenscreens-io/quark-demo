@@ -16,9 +16,10 @@ obj.emit('', ...args)
 class Events {
 
 	constructor() {
-		this.listeners = new Map();
-		this.onceListeners = new Map();
-		this.triggers = new Map();
+		const me = this;
+		me.listeners = new Map();
+		me.onceListeners = new Map();
+		me.triggers = new Map();
 	}
 
 	// help-function for onReady and onceReady
@@ -73,7 +74,7 @@ class Events {
 			me.removeAllListeners(label);
 		} else {
 			// remove listeners only with match callbackfunctions
-			let _off = (inListener) => {
+			const _off = (inListener) => {
 				const listeners = inListener.get(label);
 				if (listeners) {
 					inListener.set(label, listeners.filter((value) => (value !== callback)));
@@ -96,7 +97,8 @@ class Events {
 
 	// trigger the event with the label
 	emit(label, ...args) {
-		const me = this;		
+		const me = this;
+		
 		me.triggers.set(label, ...args); // save all triggerd labels for onready and onceready
 		const _trigger = (inListener, label, ...args) => {
 			const listeners = inListener.get(label);

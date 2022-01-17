@@ -29,7 +29,7 @@ class Buffer {
 
 	static fromHex(value) {
 
-		let arry = [];
+		const arry = [];
 
 		for (let i = 0; i < value.length; i += 2) {
 			arry.push(parseInt("0x" + value.substr(i, 2), 16));

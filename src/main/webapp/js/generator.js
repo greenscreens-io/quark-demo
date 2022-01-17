@@ -178,20 +178,18 @@ class Generator extends Events {
 
 		function fn() {
 
-			let args, req, promise = null;
+			const args = Array.prototype.slice.call(arguments);
 
-			args = Array.prototype.slice.call(arguments);
-
-			req = {
+			const req = {
 				"namespace": prop.n,
 				"action": prop.c,
 				"method": prop.m,
 				"e": prop.e,
 				"data": args,
-				"ts":Date.now()
+				"ts": Date.now()
 			};
 
-			promise = new Promise((resolve, reject) => {
+			const promise = new Promise((resolve, reject) => {
 				me.emit('call', req, (err, obj) => {
 					me._onResponse(err, obj, prop, resolve, reject);
 				});
