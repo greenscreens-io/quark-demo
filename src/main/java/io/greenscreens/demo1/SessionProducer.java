@@ -9,15 +9,15 @@ package io.greenscreens.demo1;
 import java.util.Enumeration;
 
 import javax.enterprise.inject.Produces;
-import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.annotation.WebListener;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import com.ibm.as400.access.AS400;
+
+import io.greenscreens.quark.QuarkProducer;
 
 /**
  * Custom session producer which will always create http session
@@ -25,8 +25,6 @@ import com.ibm.as400.access.AS400;
  */
 @WebListener
 public class SessionProducer implements ServletRequestListener, HttpSessionListener {
-
-    private static final ThreadLocal<HttpSession> SESSIONS = new ThreadLocal<>();
     
     @Override
 	public void sessionCreated(final HttpSessionEvent se) {}
@@ -53,19 +51,9 @@ public class SessionProducer implements ServletRequestListener, HttpSessionListe
 		
 	}
 
-	@Override
-    public void requestDestroyed(final ServletRequestEvent sre) {    	
-        SESSIONS.remove();
-    }
-
-    @Override
-    public void requestInitialized(final ServletRequestEvent sre) {
-        SESSIONS.set(HttpServletRequest.class.cast(sre.getServletRequest()).getSession());
-    }
-
     @Produces @Autoinit
     protected HttpSession getSession() {
-        return SESSIONS.get();
+        return QuarkProducer.getWebSession(false);
     }
 
 }

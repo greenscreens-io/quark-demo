@@ -6,9 +6,12 @@
  */
 package io.greenscreens.jt400.programs.qsys.qdcrdevd;
 
+import javax.enterprise.inject.Vetoed;
+
 import io.greenscreens.jt400.annotations.JT400Format;
 
 @JT400Format(length = 177)
+@Vetoed
 public class DEVD0300 extends DEVD0100 {
 
 	@JT400Format(offset = 104, length = 10)

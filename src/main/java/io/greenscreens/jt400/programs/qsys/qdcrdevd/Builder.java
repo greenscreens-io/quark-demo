@@ -8,12 +8,15 @@ package io.greenscreens.jt400.programs.qsys.qdcrdevd;
 
 import java.nio.ByteBuffer;
 
+import javax.enterprise.inject.Vetoed;
+
 import io.greenscreens.jt400.JT400ExtUtil;
 import io.greenscreens.jt400.interfaces.IJT400Format;
 
 /**
  * Builder to build {@link QDCRDEVD} program parameter.
  */
+@Vetoed
 public class Builder {
 
 	ByteBuffer receiver;

@@ -6,14 +6,17 @@
  */
 package io.greenscreens.demo1;
 
+import java.util.Objects;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.greenscreens.quark.cdi.Required;
 import io.greenscreens.demo.DemoURLConstants;
+import io.greenscreens.quark.QuarkUtil;
+import io.greenscreens.quark.cdi.Required;
 import io.greenscreens.quark.ext.ExtJSResponse;
 import io.greenscreens.quark.ext.annotations.ExtJSAction;
 import io.greenscreens.quark.ext.annotations.ExtJSDirect;
@@ -30,7 +33,8 @@ public class AS400Controller {
 
 	// we support storing multiple as400 objects under different names
 	// use for an example @SessionAttribute("as400") or just use default
-	@Inject
+	// use @Authenticated to inject only if valid (in other controllers) 
+	@Inject 
 	SystemI as400;
 
 	// we have our own producer, as default will inject session only if it exists
@@ -47,12 +51,12 @@ public class AS400Controller {
 		try {
 			as400.setUsePasswordCache(false);
 			as400.setSystemName(system);
-			as400.authenticate(userName, password);
-			resp.setStatus(true);
+			resp.setStatus(as400.validateSignon(userName, password));
 		} catch (Exception e) {
-			resp.setMessage(e.getMessage());
-			LOG.error(e.getMessage());
-			LOG.debug(e.getMessage(), e);
+			final String msg = QuarkUtil.toMessage(e);
+			resp.setMessage(msg);
+			LOG.error(msg);
+			LOG.debug(msg, e);
 		}
 
 		return resp.build();
@@ -60,8 +64,8 @@ public class AS400Controller {
 
 	@ExtJSMethod("logout")
 	public ExtJSResponse logout() {
-		as400.disconnectAllServices();
-		session.invalidate();
+		if (Objects.nonNull(as400)) as400.disconnectAllServices();		
+		if (Objects.nonNull(session)) session.invalidate();
 		return new ExtJSResponse(true, null);
 	}
 

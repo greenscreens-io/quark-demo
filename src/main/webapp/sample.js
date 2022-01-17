@@ -29,19 +29,19 @@ const msg = 'This is a test for encrypting đšžćčĐŠŽČ';
  */
 async function test1() {
 
-	let id = Date.now();
-	let res = await fetch(api, {
+	const id = Date.now();
+	const res = await fetch(api, {
 		method: 'get',
 		headers: {
 			'x-time': id
 		}
 	});
-	let def = await res.json();
+	const def = await res.json();
 	def.challenge = id;
 
 	console.log('Building API');
 
-	let generator = await Generator.build(def.api);
+	const generator = await Generator.build(def.api);
 
 	console.log('Verifying encryption data');
 	await Security.init(def);
@@ -55,7 +55,7 @@ async function test1() {
 	});
 
 	console.log('Calling API');
-	let data = await io.greenscreens.Demo.hello('John Doe');
+	const data = await io.greenscreens.Demo.hello('John Doe');
 	console.log(data);
 
 	generator.stop();
@@ -68,7 +68,7 @@ async function test1() {
  */
 function test2() {
 
-	let engine = new Engine({
+	const engine = new Engine({
 		api: api,
 		service: api
 	});
@@ -97,20 +97,23 @@ async function test3() {
 
 	let data = null;
 
-	let engine = await Engine.init({
+	const engine = await Engine.init({
 		api: api,
 		service: api
 	});
 
-	// encryption enabled by default (see DemoController.java)
-	data = await io.greenscreens.Demo.hello('John Doe');
-	console.log(data);
+	try {
+		// encryption enabled by default (see DemoController.java)
+		data = await io.greenscreens.Demo.hello('John Doe');
+		console.log(data);
+	
+		// encryption disabled (see DemoController.java)
+		data = await io.greenscreens.Demo.helloUnsafe('John Doe');
+		console.log(data);		
+	} finally {
+		engine.stop();
+	}
 
-	// encryption disabled (see DemoController.java)
-	data = await io.greenscreens.Demo.helloUnsafe('John Doe');
-	console.log(data);
-
-	engine.stop();
 }
 
 /**
@@ -118,19 +121,19 @@ async function test3() {
  */
 async function test4() {
 
-	let challenge = Date.now();
-	let res = await fetch(api, {
+	const challenge = Date.now();
+	const res = await fetch(api, {
 		method: 'get',
 		headers: {
 			'x-time': challenge
 		}
 	});
-	let def = await res.json();
+	const def = await res.json();
 	def.challenge = challenge;
 
-	let security = await Security.init(def);
+	const security = await Security.init(def);
 
-	let enc = await security.encrypt(msg);
+	const enc = await security.encrypt(msg);
 	console.log(enc);
 }
 
@@ -140,17 +143,20 @@ async function test4() {
  */
 async function test5() {
 
-	let engine = await Engine.init({
+	const engine = await Engine.init({
 		api: api,
 		service: ws
 	});
 
-	// no encryption on request as no data (parameter on functon)
-	// response is encrypted
-	let data = await io.greenscreens.Demo.saveUser('John Doe', 'john.doe@acme.com');
-	console.log(data);
+	try {
+		// no encryption on request as no data (parameter on functon)
+		// response is encrypted
+		const data = await io.greenscreens.Demo.saveUser('John Doe', 'john.doe@acme.com');
+		console.log(data);		
+	} finally {
+		engine.stop();		
+	}
 
-	engine.stop();
 }
 
 /**
@@ -159,15 +165,17 @@ async function test5() {
  */
 async function test6() {
 
-	let engine = await Engine.init({
+	const engine = await Engine.init({
 		api: api,
 		service: ws
 	});
 
-	let data = await io.greenscreens.Demo.listUsers();
-	console.log(data);
-
-	engine.stop();
+	try {
+		const data = await io.greenscreens.Demo.listUsers();
+		console.log(data);
+	} finally {
+		engine.stop();
+	}
 }
 
 /**
@@ -176,18 +184,20 @@ async function test6() {
  */
 async function test7() {
 
-	let engine = await Engine.init({
+	const engine = await Engine.init({
 		api: api,
 		service: ws
 	});
 
-	let i = 10;
-	while (i--) {
-		let data = await io.greenscreens.Demo.hello('John Doe call: ' + i);
-		console.log(data);
+	try {
+		let i = 10;
+		while (i--) {
+			let data = await io.greenscreens.Demo.hello('John Doe call: ' + i);
+			console.log(data);
+		}
+	} finally {
+		engine.stop();
 	}
-
-	engine.stop();
 
 }
 
@@ -197,18 +207,19 @@ async function test7() {
  */
 async function test8() {
 
-	let engine = await Engine.init({
+	const engine = await Engine.init({
 		api: ws,
 		service: ws
 	});
 
-	let i = 10;
-	while (i--) {
-		let data = await io.greenscreens.Demo.hello('John Doe call: ' + i);
-		console.log(data);
+	try {
+		let i = 10;
+		while (i--) {
+			console.log(data);
+		}
+	} finally {
+		engine.stop();
 	}
-
-	engine.stop();
 
 }
 
@@ -217,15 +228,18 @@ async function test8() {
  */
 async function test9() {
 
-	let engine = await Engine.init({
+	const engine = await Engine.init({
 		api: ws,
 		service: ws
 	});
 
-	let data = await io.greenscreens.AS400.login('YOUR_SYSTEM', 'QSECOFR', 'QSECOFR');
-	console.log(data);
-	await io.greenscreens.AS400.logout();
-	engine.stop();
+	try {
+		const data = await io.greenscreens.AS400.login('YOUR_SYSTEM', 'QSECOFR', 'QSECOFR');
+		console.log(data);
+		await io.greenscreens.AS400.logout();
+	} finally {
+		engine.stop();
+	}
 }
 
 /**
@@ -233,21 +247,29 @@ async function test9() {
  */
 async function test10() {
 
-	let engine = await Engine.init({
+	const engine = await Engine.init({
 		api: ws,
 		service: ws
 	});
 
-	let data = await io.greenscreens.AS400.login('YOUR_SYSTEM', 'QSECOFR', 'QSECOFR');
-	console.log(data);
-
-	let ifs = await io.greenscreens.IFS.list('/');
-	console.log(ifs);
-
-	await io.greenscreens.AS400.logout();
-	engine.stop();
+	try {
+		const data = await io.greenscreens.AS400.login('YOUR_SYSTEM', 'QSECOFR', 'QSECOFR');
+		console.log(data);
+	
+		const ifs = await io.greenscreens.IFS.list('/');
+		console.log(ifs);
+	
+		await io.greenscreens.AS400.logout();		
+	} finally {
+		engine.stop();
+	}
 }
 
+/**
+ * Test all
+ * NOTE: it is enough to init engine only once.
+ * Here, for the sake of tests, we are initializing engien everry time
+ */
 async function test() {
 	await test1();
 	await test3();

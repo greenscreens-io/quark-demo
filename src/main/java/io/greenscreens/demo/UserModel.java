@@ -3,6 +3,9 @@
  */
 package io.greenscreens.demo;
 
+import javax.enterprise.inject.Vetoed;
+
+@Vetoed
 public class UserModel {
  
 	private long id;

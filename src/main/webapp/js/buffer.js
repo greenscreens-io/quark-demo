@@ -40,9 +40,9 @@ class Buffer {
 
 	static fromBase64(value) {
 
-		let strbin = atob(value);
-		let buffer = new ArrayBuffer(strbin.length);
-		let bufView = new Uint8Array(buffer);
+		const strbin = atob(value);
+		const buffer = new ArrayBuffer(strbin.length);
+		const bufView = new Uint8Array(buffer);
 
 		for (let i = 0, strLen = strbin.length; i < strLen; i++) {
 			bufView[i] = strbin.charCodeAt(i);

@@ -6,6 +6,8 @@
  */
 package io.greenscreens.jt400.programs.qsys.qdcrdevd;
 
+import javax.enterprise.inject.Vetoed;
+
 import com.ibm.as400.access.AS400;
 
 import io.greenscreens.jt400.JT400ExtFactory;
@@ -14,6 +16,7 @@ import io.greenscreens.jt400.interfaces.IJT400Program;
 /**
  * Represents QDCRDEVD program
  */
+@Vetoed
 public interface IQDCRDEVD extends IJT400Program<QDCRDEVD> {
 
 	public static IQDCRDEVD create(final AS400 as400) {

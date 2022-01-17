@@ -8,18 +8,18 @@ package io.greenscreens.demo1;
 
 import java.beans.PropertyVetoException;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.InjectionPoint;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.greenscreens.quark.QuarkStorage;
 
 /**
  * Application level instance used to provide AS400 object / httpsession
@@ -29,17 +29,15 @@ public class SystemIProducer implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOG = LoggerFactory.getLogger(SystemIProducer.class);
-
-	@Inject
-	private HttpServletRequest servletRequest;
-
+	
 	/**
 	 * AS400 session level producer with default attribute name based on AS400 full class name
 	 * @param ip
 	 * @return
+	 * @throws Exception 
 	 */
 	@Produces
-	public SystemI producer(final InjectionPoint ip) {
+	public SystemI producer(final InjectionPoint ip) throws Exception {
 
 		final Annotated annotated = ip.getAnnotated();
 		final boolean check = annotated.isAnnotationPresent(Authenticated.class);
@@ -54,25 +52,24 @@ public class SystemIProducer implements Serializable {
 
 		return produce(ip, key, check);
 	}
-
+	
 	/**
 	 * Internal producer method produce as400 object from given attribute name
 	 * @param ip
 	 * @param name
 	 * @return
+	 * @throws Exception 
 	 */
-	private SystemI produce(final InjectionPoint ip, final String name, final boolean check) {
+	private SystemI produce(final InjectionPoint ip, final String name, final boolean check) throws Exception {
 
-		final HttpSession session = servletRequest.getSession();
-
-		SystemI as400 = (SystemI) session.getAttribute(name);
-		if (as400 == null) {
+		SystemI as400 = QuarkStorage.get(name);
+		if (Objects.isNull(as400)) {
 			as400 = getInstance();
-			session.setAttribute(name, as400);
+			QuarkStorage.set(name, as400);
 		}
 
 		if(check && !as400.isValid()) {
-			throw new RuntimeException("User not verified!");
+			throw new Exception("User not verified!");
 		}
 
 		return as400;

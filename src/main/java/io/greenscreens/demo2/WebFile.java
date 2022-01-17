@@ -6,6 +6,9 @@
  */
 package io.greenscreens.demo2;
 
+import javax.enterprise.inject.Vetoed;
+
+@Vetoed
 public class WebFile {
 
 	public enum TYPE {

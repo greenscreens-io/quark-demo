@@ -35,8 +35,7 @@ public class QDCRDEVDController {
 
 	private static final String MSG_DSP	= "Display name must be at least 1 character long";
 
-	@Inject
-	@Authenticated
+	@Inject @Authenticated
 	SystemI as400;
 
 	/**

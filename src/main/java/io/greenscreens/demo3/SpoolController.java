@@ -23,7 +23,7 @@ import io.greenscreens.demo.DemoURLConstants;
 import io.greenscreens.demo1.Authenticated;
 import io.greenscreens.demo1.SystemI;
 import io.greenscreens.demo2.FileUtil;
-import io.greenscreens.quark.async.QuarkAsyncResponse;
+import io.greenscreens.quark.async.QuarkAsyncContext;
 import io.greenscreens.quark.ext.ExtJSResponse;
 import io.greenscreens.quark.ext.annotations.ExtJSAction;
 import io.greenscreens.quark.ext.annotations.ExtJSDirect;
@@ -41,7 +41,7 @@ public class SpoolController {
 	private static final Logger LOG = LoggerFactory.getLogger(SpoolController.class);
 
 	@Inject
-	QuarkAsyncResponse responder;
+	QuarkAsyncContext responder;
 	
 	@Inject @Authenticated
 	SystemI as400;

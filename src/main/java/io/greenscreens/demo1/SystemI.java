@@ -16,6 +16,7 @@ import com.ibm.as400.access.AS400SecurityException;
 /**
  * Custom AS400 class to support validated flag
  */
+// use special producer, do not use this as managed bean
 @Vetoed
 public class SystemI extends AS400 {
 

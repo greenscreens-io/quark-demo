@@ -8,6 +8,8 @@ package io.greenscreens.jt400.programs.qsys.qdcrdevd;
 
 import java.nio.ByteBuffer;
 
+import javax.enterprise.inject.Vetoed;
+
 import com.ibm.as400.access.AS400DataType;
 
 import io.greenscreens.jt400.annotations.Id;
@@ -29,6 +31,7 @@ import io.greenscreens.jt400.interfaces.IJT400Params;
 			DEVD0600.class,
 			DEVD0300.class
 		})
+@Vetoed
 public class QDCRDEVD implements IJT400Params {
 
 	@Id(0) @Output

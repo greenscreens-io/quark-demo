@@ -6,6 +6,8 @@
  */
 package io.greenscreens.jt400.programs.qsys.qdcrdevd;
 
+import javax.enterprise.inject.Vetoed;
+
 import com.ibm.as400.access.AS400DataType;
 
 import io.greenscreens.jt400.annotations.JT400Format;
@@ -15,6 +17,7 @@ import io.greenscreens.jt400.interfaces.IJT400Format;
  * 	Basic device information.
  */
 @JT400Format(length = 104)
+@Vetoed
 public class DEVD0100 implements IJT400Format {
 
 	@JT400Format(offset = 0, type = AS400DataType.TYPE_BIN4)

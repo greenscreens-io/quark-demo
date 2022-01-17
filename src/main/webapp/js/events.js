@@ -25,8 +25,9 @@ class Events {
 	// the callbackfunction will execute,
 	// if the label has already been triggerd with the last called parameters
 	_checkPast(label, callback) {
-		if (this.triggers.has(label)) {
-			callback(this.triggers.get(label));
+		const me = this;
+		if (me.triggers.has(label)) {
+			callback(me.triggers.get(label));
 			return true;
 		} else {
 			return false;
@@ -35,10 +36,11 @@ class Events {
 
 	// execute the callback everytime the label is trigger
 	on(label, callback, checkPast = false) {
-		this.listeners.has(label) || this.listeners.set(label, []);
-		this.listeners.get(label).push(callback);
+		const me = this;
+		me.listeners.has(label) || me.listeners.set(label, []);
+		me.listeners.get(label).push(callback);
 		if (checkPast)
-			this._checkPast(label, callback);
+			me._checkPast(label, callback);
 	}
 
 	// execute the callback everytime the label is trigger
@@ -50,9 +52,10 @@ class Events {
 
 	// execute the callback onetime the label is trigger
 	once(label, callback, checkPast = false) {
-		this.onceListeners.has(label) || this.onceListeners.set(label, []);
-		if (!(checkPast && this._checkPast(label, callback))) {
-			this.onceListeners.get(label).push(callback);
+		const me = this;
+		me.onceListeners.has(label) || me.onceListeners.set(label, []);
+		if (!(checkPast && me._checkPast(label, callback))) {
+			me.onceListeners.get(label).push(callback);
 		}
 	}
 
@@ -64,25 +67,27 @@ class Events {
 
 	// remove the callback for a label
 	off(label, callback = true) {
+		const me = this;
 		if (callback === true) {
 			// remove listeners for all callbackfunctions
-			this.removeAllListeners(label);
+			me.removeAllListeners(label);
 		} else {
 			// remove listeners only with match callbackfunctions
 			let _off = (inListener) => {
-				let listeners = inListener.get(label);
+				const listeners = inListener.get(label);
 				if (listeners) {
-					inListener.set(label, listeners.filter((value) => !(value === callback)));
+					inListener.set(label, listeners.filter((value) => (value !== callback)));
 				}
 			};
-			_off(this.listeners);
-			_off(this.onceListeners);
+			_off(me.listeners);
+			_off(me.onceListeners);
 		}
 	}
 
 	removeAllListeners(label) {
-		this.listeners.delete(label);
-		this.onceListeners.delete(label);
+		const me = this;
+		me.listeners.delete(label);
+		me.onceListeners.delete(label);
 	}
 
 	trigger(label, ...args) {
@@ -91,20 +96,20 @@ class Events {
 
 	// trigger the event with the label
 	emit(label, ...args) {
-		let res = false;
-		this.triggers.set(label, ...args); // save all triggerd labels for onready and onceready
-		let _trigger = (inListener, label, ...args) => {
-			let listeners = inListener.get(label);
+		const me = this;		
+		me.triggers.set(label, ...args); // save all triggerd labels for onready and onceready
+		const _trigger = (inListener, label, ...args) => {
+			const listeners = inListener.get(label);
 			if (listeners && listeners.length) {
 				listeners.forEach((listener) => {
 					listener(...args);
 				});
-				res = true;
+				return true;
 			}
 		};
-		_trigger(this.onceListeners, label, ...args);
-		_trigger(this.listeners, label, ...args);
-		this.onceListeners.delete(label); // callback for once executed, so delete it.
+		let res = _trigger(me.onceListeners, label, ...args);
+		res = res || _trigger(me.listeners, label, ...args);
+		me.onceListeners.delete(label); // callback for once executed, so delete it.
 		return res;
 	}
 }

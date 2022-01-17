@@ -26,7 +26,7 @@ class Generator extends Events {
 	 */
 	stop() {
 
-		let me = this;
+		const me = this;
 		me.removeAllListeners('call');
 		me.removeAllListeners('api');
 		me.detach();
@@ -36,8 +36,8 @@ class Generator extends Events {
 	 * Detach generated API namespace from global
 	 */
 	detach() {
-		let me = this;
-		let root = typeof global === 'undefined' ? self : global;
+		const me = this;
+		const root = typeof global === 'undefined' ? self : global;
 		Object.keys(me._model).forEach(v => root[v] = null);
 		me._model = {};
 	}
@@ -46,8 +46,8 @@ class Generator extends Events {
 	 * Attach generated API namespace to global
 	 */
 	attach() {
-		let me = this;
-		let root = typeof global === 'undefined' ? self : global;
+		const me = this;
+		const root = typeof global === 'undefined' ? self : global;
 		Object.entries(me._model).forEach(v => root[v[0]] = v[1]);
 	}
 
@@ -60,8 +60,8 @@ class Generator extends Events {
 	 */
 	build(o) {
 
-		let me = this;
-		let data = o ? o.api || o : null;
+		const me = this;
+		const data = o ? o.api || o : null;
 
 		if (!data) return data;
 		me._buildAPI(data);
@@ -79,13 +79,10 @@ class Generator extends Events {
 	 */
 	_buildAPI(cfg) {
 
-		let me = this;
+		const me = this;
 
 		if (Array.isArray(cfg)) {
-			cfg.every(v => {
-				me._buildInstance(v);
-				return true;
-			});
+			cfg.forEach(v => me._buildInstance(v));
 		} else {
 			me._buildInstance(cfg);
 		}
@@ -100,7 +97,7 @@ class Generator extends Events {
 	 */
 	_buildInstance(api) {
 
-		let me = this;
+		const me = this;
 		let tree = null;
 		let action = null;
 
@@ -111,10 +108,8 @@ class Generator extends Events {
 		}
 		action = tree[api.action];
 
-		api.methods.every(v => {
-			me._buildMethod(api.namespace, api.action, action, v);
-			return true;
-		});
+		api.methods.forEach(v => me._buildMethod(api.namespace, api.action, action, v));
+
 	}
 
 	/**
@@ -128,7 +123,7 @@ class Generator extends Events {
 	 */
 	_buildNamespace(namespace) {
 
-		let me = this;
+		const me = this;
 		let tmp = null;
 
 		namespace.split('.').every(v => {
@@ -158,8 +153,8 @@ class Generator extends Events {
 	 */
 	_buildMethod(namespace, action, instance, api) {
 
-		let enc = api.encrypt === false ? false : true;
-		let cfg = {
+		const enc = api.encrypt === false ? false : true;
+		const cfg = {
 			n: namespace,
 			c: action,
 			m: api.name,
@@ -178,8 +173,8 @@ class Generator extends Events {
 	 */
 	_apiFn(params) {
 
-		let me = this;
-		let prop = params;
+		const me = this;
+		const prop = params;
 
 		function fn() {
 
@@ -192,7 +187,8 @@ class Generator extends Events {
 				"action": prop.c,
 				"method": prop.m,
 				"e": prop.e,
-				"data": args
+				"data": args,
+				"ts":Date.now()
 			};
 
 			promise = new Promise((resolve, reject) => {
@@ -217,7 +213,7 @@ class Generator extends Events {
 			return;
 		}
 
-		let sts = (prop.c === obj.action) &&
+		const sts = (prop.c === obj.action) &&
 			(prop.m === obj.method) &&
 			obj.result &&
 			obj.result.success;
@@ -234,7 +230,7 @@ class Generator extends Events {
 	 * Static instance builder
 	 */
 	static async build(cfg) {
-		let generator = new Generator();
+		const generator = new Generator();
 		generator.build(cfg);
 		return generator;
 	}

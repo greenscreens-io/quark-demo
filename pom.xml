@@ -22,8 +22,8 @@
 		<maven.jar.version>3.2.0</maven.jar.version>
 		<maven.war.version>3.3.1</maven.war.version>
 		<maven.proguard.version>2.3.1</maven.proguard.version>
-		<bcastle.version>1.67</bcastle.version>
-		<jackson.version>2.12.1</jackson.version>
+		<jackson.version>2.13.0</jackson.version>
+		<bcastle.version>1.69</bcastle.version>
 	</properties>
 
 	<build>
@@ -32,11 +32,18 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.version}</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>${maven.eclipse.plugin}</version>
 			</plugin>
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-war-plugin</artifactId>
+			    <version>${maven.war.version}</version>
+			</plugin>			
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>3.0.0</version>
@@ -47,19 +54,17 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>io.greenscreens</groupId>
+			<groupId>io.greenscreens.jt400</groupId>
 			<artifactId>jt400-extra</artifactId>
 			<version>1.2.1</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/src/main/webapp/WEB-INF/lib/jt400-extra-1.2.1.jar</systemPath>
+			<scope>provided</>
 		</dependency>
 
 		<dependency>
-			<groupId>io.greenscreens</groupId>
+			<groupId>io.greenscreens.quark</groupId>
 			<artifactId>quark</artifactId>
-			<version>2.1.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/src/main/webapp/WEB-INF/lib/quark-2.3.1.jar</systemPath>
+			<version>3.0.0</version>
+			<scope>provided</>
 		</dependency>
 
 		<dependency>
@@ -88,7 +93,7 @@
 		<dependency>
 			<groupId>org.jboss.weld.servlet</groupId>
 			<artifactId>weld-servlet-shaded</artifactId>
-			<version>3.1.5.Final</version>
+			<version>3.1.8.Final</version>
 		</dependency>
 
 		<dependency>
