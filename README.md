@@ -1,5 +1,5 @@
 
-# [Quark Engine DEMO](https://www.greenscreens.io/quark).
+# [Quark Engine DEMO](https://quark.greenscreens.ltd/).
 
 ![Compile](https://github.com/greenscreens-io/quark-demo/workflows/Compile/badge.svg?branch=master)
 ![GitHub](https://img.shields.io/github/license/greenscreens-io/quark-demo?style=plastic)
@@ -7,11 +7,11 @@
 ![GitHub Last Commit](https://img.shields.io/github/last-commit/greenscreens-io/quark-demo?style=plastic)
 
 
-Visit project web page [here](https://www.greenscreens.io/quark).
+Visit project web page [here](https://quark.greenscreens.ltd/).
 
 The is small Java web app for testing Quark Engine.
 
-To see how to use it, visit project web page [here](https://www.greenscreens.io/quark).
+To see how to use it, visit project web page [here](https://quark.greenscreens.ltd/).
 
 ### Build
 
@@ -19,4 +19,4 @@ To see how to use it, visit project web page [here](https://www.greenscreens.io/
 2. Use maven build clean install
 3. Optionally, import demo projects into Eclipse
 
-&copy; Green Screens Ltd. 2016 - 2020
+&copy; Green Screens Ltd. 2016 - 2022
