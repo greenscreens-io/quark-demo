@@ -7,6 +7,7 @@
 package io.greenscreens.servlet;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,14 +20,35 @@ import io.greenscreens.quark.web.QuarkAPIServlet;
  * 
  * http://localhost/demo/quark.js
  */
-@WebServlet("/quark.js")
+@WebServlet(urlPatterns = {Constants.QUARK, Constants.MAP})
 public class QuarkJsServlet extends QuarkAPIServlet {
 
 	private static final long serialVersionUID = 1L;
 	
 	@Override
 	protected void onGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-		script(request, response);
+		
+		final String servletPath = request.getServletPath();
+		final boolean isScript = servletPath.contains(Constants.QUARK);
+		
+		if (isScript) {
+			script(request, response);
+			return;
+		} 
+		
+		if (servletPath.endsWith("map")) {
+			map(request, response);
+			return;			
+		}
+		
+		final String path = request.getParameter("q");
+		if (Objects.isNull(path)) {			
+			services(response);
+			return;
+		}
+		
+		final String[] paths = new String[] {path};	
+		build(request, response, paths);	
 	}
 
 }

@@ -1,32 +1,27 @@
 /*
- * Copyright (C) 2015, 2020  Green Screens Ltd.
+ * Copyright (C) 2015, 2022 Green Screens Ltd.
  */
 
 /**
  * Queue to handle requests
  */
-class Queue extends Map {
+export default class Queue extends Map {
 
-	constructor() {
-		super();
-		const me = this;
-
-		me.up = 0;
-		me.down = 0;
-		me.tid = 0;
-	}
+	#up = 0;
+	#down = 0;
+	#tid = 0;
 
 	/**
 	 * Update counters and queue to link resposnes to requests
 	 * @param {Object} req
 	 *      Request data
 	 */
-	updateRequest(req, callback) {
+	updateRequest(req) {
 		const me = this;
-		me.tid++;
-		me.up++;
-		req.tid = me.tid.toString();
-		me.set(req.tid, callback);
+		me.#tid++;
+		me.#up++;
+		req.tid = me.#tid.toString();
+		me.set(req.tid, req);
 	}
 
 	/**
@@ -34,9 +29,10 @@ class Queue extends Map {
 	 */
 	reset() {
 		const me = this;
-		if (me.up > 50 && me.down >= me.up) {
-			me.up = 0;
-			me.down = 0;
+		if (me.#up > 50 && me.#down >= me.#up) {
+			me.#up = 0;
+			me.#down = 0;
+			me.clear();
 		}
 	}
 
@@ -75,14 +71,15 @@ class Queue extends Map {
 		const tid = obj.tid;
 		let unknown = null;
 
-		me.down++;
+		me.#down++;
 
 		if (me.has(tid)) {
+			const req = me.get(tid);
 			try {
-				me.get(tid)(null, obj);
+				req.finish(obj);
 			} catch (e) {
 				console.log(e);
-				me.get(tid)(e, null);
+				req.finish(e);
 			} finally {
 				me.delete(tid);
 			}
