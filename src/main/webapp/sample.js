@@ -17,6 +17,8 @@
  *   This engine supports both channels
  */
 
+import { QuarkEngine } from 'release/io.greenscreens.quark.esm.min.js';
+
 const isSecured = location.protocol === "https:";
 const wsProtocol = isSecured === true ? 'wss' : 'ws';
 const ws = `${wsProtocol}://${location.host}/demo/socket`;
@@ -68,7 +70,7 @@ async function test1() {
  */
 function test2() {
 
-	const engine = new Engine({
+	const engine = new QuarkEngine({
 		api: api,
 		service: api
 	});
@@ -97,7 +99,7 @@ async function test3() {
 
 	let data = null;
 
-	const engine = await Engine.init({
+	const engine = await QuarkEngine.init({
 		api: api,
 		service: api
 	});
@@ -143,7 +145,7 @@ async function test4() {
  */
 async function test5() {
 
-	const engine = await Engine.init({
+	const engine = await QuarkEngine.init({
 		api: api,
 		service: ws
 	});
@@ -165,7 +167,7 @@ async function test5() {
  */
 async function test6() {
 
-	const engine = await Engine.init({
+	const engine = await QuarkEngine.init({
 		api: api,
 		service: ws
 	});
@@ -184,7 +186,7 @@ async function test6() {
  */
 async function test7() {
 
-	const engine = await Engine.init({
+	const engine = await QuarkEngine.init({
 		api: api,
 		service: ws
 	});
@@ -207,7 +209,7 @@ async function test7() {
  */
 async function test8() {
 
-	const engine = await Engine.init({
+	const engine = await QuarkEngine.init({
 		api: ws,
 		service: ws
 	});
@@ -229,7 +231,7 @@ async function test8() {
  */
 async function test9() {
 
-	const engine = await Engine.init({
+	const engine = await QuarkEngine.init({
 		api: ws,
 		service: ws
 	});
@@ -248,7 +250,7 @@ async function test9() {
  */
 async function test10() {
 
-	const engine = await Engine.init({
+	const engine = await QuarkEngine.init({
 		api: ws,
 		service: ws
 	});
