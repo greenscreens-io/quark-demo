@@ -18,13 +18,12 @@
  */
 
 //import { QuarkEngine, Generator, Security } from '/demo/quark.mjs';
-import { QuarkEngine, Generator, Security, Buffer, Streams } from '/demo/modules/index.esm.mjs';
+import { QuarkEngine, Generator, Security, Streams } from '/demo/modules/index.esm.mjs';
 
 globalThis.QUARK_DEBUG = true;
 globalThis.Generator = Generator;
 globalThis.QuarkEngine = QuarkEngine;
 globalThis.Security = Security;
-globalThis.Buffer = Buffer;  
 globalThis.Streams = Streams;
 
 const isSecured = location.protocol === "https:";
