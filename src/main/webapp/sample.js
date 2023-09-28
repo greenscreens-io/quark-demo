@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, 2020  Green Screens Ltd.
+ * Copyright (C) 2015, 2023 Green Screens Ltd.
  */
 
 /**
@@ -16,7 +16,9 @@
  *
  *   This engine supports both channels
  */
-import { QuarkEngine, Generator, Security, Buffer, Streams } from '/demo/quark.mjs';
+
+//import { QuarkEngine, Generator, Security } from '/demo/quark.mjs';
+import { QuarkEngine, Generator, Security, Buffer, Streams } from '/demo/modules/index.esm.mjs';
 
 globalThis.QUARK_DEBUG = true;
 globalThis.Generator = Generator;
@@ -52,14 +54,14 @@ async function test1() {
 	const generator = await Generator.build(def.api);
 
 	console.log('Verifying encryption data');
-	await Security.init(def);
+	await Security.create(def);
 
-	generator.on('call', function(o, cb) {
-		o.result = {
+	generator.on('call', (o) => {
+		const result = {
 			success: true,
 			data: {}
 		};
-		cb(null, o)
+		o.detail.finish(result);
 	});
 
 	console.log('Calling API');
@@ -111,13 +113,9 @@ async function test3() {
 	});
 
 	try {
-		// encryption enabled by default (see DemoController.java)
 		data = await io.greenscreens.Demo.hello('John Doe');
 		console.log(data);
 	
-		// encryption disabled (see DemoController.java)
-		data = await io.greenscreens.Demo.helloUnsafe('John Doe');
-		console.log(data);		
 	} finally {
 		engine.stop();
 	}
@@ -139,7 +137,7 @@ async function test4() {
 	const def = await res.json();
 	def.challenge = challenge;
 
-	const security = await Security.init(def);
+	const security = await Security.create(def);
 
 	const enc = await security.encrypt(msg);
 	console.log(enc);
@@ -200,7 +198,7 @@ async function test7() {
 	try {
 		let i = 10;
 		while (i--) {
-			const data = await io.greenscreens.Demo.hello('John Doe call: ' + i);
+			let data = await io.greenscreens.Demo.hello('John Doe call: ' + i);
 			console.log(data);
 		}
 	} finally {
@@ -223,7 +221,7 @@ async function test8() {
 	try {
 		let i = 10;
 		while (i--) {
-			const data = await io.greenscreens.Demo.hello('John Doe call: ' + i);
+			const data = await io.greenscreens.Demo.saveUser('John Doe', 'john.doe@acme.com');
 			console.log(data);
 		}
 	} finally {
@@ -279,7 +277,7 @@ async function test10() {
  * NOTE: it is enough to init engine only once.
  * Here, for the sake of tests, we are initializing engien everry time
  */
-async function test() {
+async function testAll() {
 	await test1();
 	await test3();
 	await test4();
@@ -289,3 +287,6 @@ async function test() {
 	await test8();
 	test2();
 }
+
+globalThis.testAll = testAll;
+globalThis.test = {test1, test2, test3, test4, test5, test6, test7, test8};
