@@ -16,8 +16,14 @@
  *
  *   This engine supports both channels
  */
+import { QuarkEngine, Generator, Security, Buffer, Streams } from '/demo/quark.mjs';
 
-import { QuarkEngine } from 'release/io.greenscreens.quark.esm.min.js';
+globalThis.QUARK_DEBUG = true;
+globalThis.Generator = Generator;
+globalThis.QuarkEngine = QuarkEngine;
+globalThis.Security = Security;
+globalThis.Buffer = Buffer;  
+globalThis.Streams = Streams;
 
 const isSecured = location.protocol === "https:";
 const wsProtocol = isSecured === true ? 'wss' : 'ws';

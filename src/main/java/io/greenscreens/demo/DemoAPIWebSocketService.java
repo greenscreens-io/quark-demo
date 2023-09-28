@@ -18,8 +18,10 @@ import io.greenscreens.quark.websocket.WebsocketEvent;
 @ServerEndpoint(
 		value = DemoURLConstants.WSOCKET,
 		configurator = WebSocketConfigurator.class,
-        decoders = { WebsocketDecoder.class, WebsocketDecoderBinary.class},
-        encoders = { WebsocketEncoder.class, WebsocketEncoderBinary.class})
+        decoders = { WebsocketDecoderBinary.class, WebsocketDecoder.class},
+        //encoders = { WebsocketEncoderBinary.class, WebsocketEncoder.class}      
+        encoders = { WebsocketEncoderBinary.class}
+)
 public class DemoAPIWebSocketService extends WebSocketService {
 
 	public void broadcast(@Observes final WebsocketBroadcastEvent wsEvent) {

@@ -20,7 +20,7 @@ import io.greenscreens.quark.web.QuarkAPIServlet;
  * 
  * http://localhost/demo/quark.js
  */
-@WebServlet(urlPatterns = {Constants.QUARK, Constants.MAP})
+@WebServlet(urlPatterns = {Constants.SCRIPT, Constants.MODULE, Constants.MAP})
 public class QuarkJsServlet extends QuarkAPIServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -29,9 +29,8 @@ public class QuarkJsServlet extends QuarkAPIServlet {
 	protected void onGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
 		
 		final String servletPath = request.getServletPath();
-		final boolean isScript = servletPath.contains(Constants.QUARK);
-		
-		if (isScript) {
+
+		if (isEngine(request)) {
 			script(request, response);
 			return;
 		} 
