@@ -13,6 +13,10 @@ The is small Java web app for testing Quark Engine.
 
 To see how to use it, visit project web page [here](https://quark.greenscreens.ltd/).
 
+### Important !!!
+ - To use with older Java EE 8, use version Tag 5.0.0
+ - To use with Jakarta Java EE, use version Tag 6.0.0 or newer
+
 ### Build
 
 1. Clone repository to local drive

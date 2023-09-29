@@ -6,7 +6,7 @@
  */
 package io.greenscreens.jt400.programs.qsys.qdcrdevd;
 
-import javax.enterprise.inject.Vetoed;
+import jakarta.enterprise.inject.Vetoed;
 
 import com.ibm.as400.access.AS400DataType;
 

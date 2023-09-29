@@ -3,7 +3,7 @@
  */
 package io.greenscreens.demo;
 
-import javax.enterprise.inject.Vetoed;
+import jakarta.enterprise.inject.Vetoed;
 
 @Vetoed
 public class UserModel {

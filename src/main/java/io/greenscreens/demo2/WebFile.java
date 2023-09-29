@@ -6,7 +6,7 @@
  */
 package io.greenscreens.demo2;
 
-import javax.enterprise.inject.Vetoed;
+import jakarta.enterprise.inject.Vetoed;
 
 @Vetoed
 public class WebFile {

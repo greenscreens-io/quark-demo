@@ -8,7 +8,7 @@ package io.greenscreens.demo1;
 
 import java.io.IOException;
 
-import javax.enterprise.inject.Vetoed;
+import jakarta.enterprise.inject.Vetoed;
 
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400SecurityException;

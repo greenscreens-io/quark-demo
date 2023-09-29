@@ -3,7 +3,7 @@
  */
 package io.greenscreens.demo;
 
-import javax.servlet.annotation.WebServlet;
+import jakarta.servlet.annotation.WebServlet;
 
 import io.greenscreens.quark.web.QuarkAPIServlet;
 

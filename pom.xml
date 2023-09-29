@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.greenscreens.quark-demo</groupId>
 	<artifactId>demo</artifactId>
-	<version>1.0.0</version>
+	<version>6.0.0</version>
 	<packaging>war</packaging>
 
 	<name>Green Screens Quark Engine Demo</name>
@@ -22,6 +22,7 @@
 		<maven.jar.version>3.2.0</maven.jar.version>
 		<maven.war.version>3.3.1</maven.war.version>
 		<maven.proguard.version>2.3.1</maven.proguard.version>
+		<hibernate.version>8.0.1.Final</hibernate.version>
 		<jackson.version>2.14.2</jackson.version>
 		<bcastle.version>1.76</bcastle.version>
 	</properties>
@@ -64,9 +65,9 @@
 		<dependency>
 			<groupId>io.greenscreens</groupId>
 			<artifactId>quark</artifactId>
-			<version>5.0.0</version>
+			<version>6.0.0</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/src/main/webapp/WEB-INF/lib/quark-5.0.0.jar</systemPath>
+			<systemPath>${basedir}/src/main/webapp/WEB-INF/lib/quark-6.0.0.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -80,22 +81,35 @@
 			<version>1.7.30</version>
 		</dependency>
 		<dependency>
-			<groupId>javax.websocket</groupId>
-			<artifactId>javax.websocket-api</artifactId>
-			<version>1.1</version>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<version>6.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>4.0.1</version>
+			<groupId>jakarta.websocket</groupId>
+			<artifactId>jakarta.websocket-api</artifactId>
+			<version>2.1.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.websocket</groupId>
+			<artifactId>jakarta.websocket-client-api</artifactId>
+			<version>2.1.1</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.jboss.weld.servlet</groupId>
 			<artifactId>weld-servlet-shaded</artifactId>
-			<version>3.1.8.Final</version>
+			<version>5.1.0.Final</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.weld.servlet</groupId>
+			<artifactId>weld-servlet-core</artifactId>
+			<version>5.1.0.Final</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -118,18 +132,21 @@
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk18on</artifactId>
 			<version>${bcastle.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk18on</artifactId>
 			<version>${bcastle.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- This segment required if JSR380 bean validation is used -->
 		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>2.0.1.Final</version>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>3.0.2</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml</groupId>
@@ -139,17 +156,20 @@
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>6.1.5.Final</version>
+			<version>${hibernate.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator-annotation-processor</artifactId>
-			<version>6.1.5.Final</version>
+			<version>${hibernate.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator-cdi</artifactId>
-			<version>6.1.5.Final</version>
+			<version>${hibernate.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- This segment required only for JT400 demo, no framework itself -->
@@ -158,7 +178,6 @@
 			<artifactId>jt400</artifactId>
 			<version>11.0</version>
 		</dependency>
-
 	</dependencies>
 
 </project>

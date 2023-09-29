@@ -8,8 +8,8 @@ package io.greenscreens.demo1;
 
 import java.util.Objects;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

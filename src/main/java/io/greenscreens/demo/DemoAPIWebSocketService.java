@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2015, 2016  Green Screens Ltd.
+ * Copyright (C) 2015, 2023 Green Screens Ltd.
  */
 package io.greenscreens.demo;
 
-import javax.enterprise.event.Observes;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.enterprise.event.Observes;
+import jakarta.websocket.server.ServerEndpoint;
 
 import io.greenscreens.quark.websocket.WebSocketConfigurator;
 import io.greenscreens.quark.websocket.WebSocketService;
