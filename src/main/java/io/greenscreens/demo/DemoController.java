@@ -29,13 +29,6 @@ import io.greenscreens.quark.ext.annotations.ExtJSMethod;
 @ExtJSAction(namespace = DemoURLConstants.NAMESPACE, action = "Demo")
 public class DemoController {
 
-	@ExtJSMethod( value = "helloUnsafe", encrypt = false)
-	public ExtJSResponse helloWorldUnsafe(final String name) {
-		ExtJSResponse resp = new ExtJSResponse(true, null);
-		resp.setMsg("Hello ".concat(name));
-		return resp;
-	}
-
 	@ExtJSMethod("hello")
 	public ExtJSResponse helloWorld(@Required final String name) {
 		ExtJSResponse resp = new ExtJSResponse(true, null);
