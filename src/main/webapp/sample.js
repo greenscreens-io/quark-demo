@@ -17,14 +17,15 @@
  *   This engine supports both channels
  */
 
-//import { QuarkEngine, Generator, Security } from '/demo/quark.mjs';
-import { QuarkEngine, Generator, Security, Streams } from '/demo/modules/index.esm.mjs';
+import { QuarkEngine, Generator, Security, Buffer, Streams, WebChannel } from '/demo/quark.mjs';
 
 globalThis.QUARK_DEBUG = true;
 globalThis.Generator = Generator;
 globalThis.QuarkEngine = QuarkEngine;
 globalThis.Security = Security;
+globalThis.Buffer = Buffer;  
 globalThis.Streams = Streams;
+globalThis.WebChannel = WebChannel;
 
 const isSecured = location.protocol === "https:";
 const wsProtocol = isSecured === true ? 'wss' : 'ws';
@@ -38,22 +39,23 @@ const msg = 'This is a test for encrypting đšžćčĐŠŽČ';
  */
 async function test1() {
 
-	const id = Date.now();
+	const security = await Security.create();
+	const challenge = Date.now();
 	const res = await fetch(api, {
 		method: 'get',
 		headers: {
-			'x-time': id
+			'gs-public-key' : security.publicKey,
+			'gs-challenge': challenge
 		}
 	});
-	const def = await res.json();
-	def.challenge = id;
-
+	
+	const raw = await WebChannel.fromResponse(res);
+	
+	console.log('Decoding GS data');
+	const def = await Streams.unwrap(raw, security, challenge);
+	
 	console.log('Building API');
-
 	const generator = await Generator.build(def.api);
-
-	console.log('Verifying encryption data');
-	await Security.create(def);
 
 	generator.on('call', (o) => {
 		const result = {
@@ -126,20 +128,28 @@ async function test3() {
  */
 async function test4() {
 
+	const security = await Security.create();
 	const challenge = Date.now();
 	const res = await fetch(api, {
 		method: 'get',
 		headers: {
-			'x-time': challenge
+			'gs-public-key' : security.publicKey,
+			'gs-challenge': challenge
 		}
 	});
-	const def = await res.json();
-	def.challenge = challenge;
+	
+	const raw = await WebChannel.fromResponse(res);
+	await Streams.unwrap(raw, security, challenge);
 
-	const security = await Security.create(def);
+	console.log('Text :', msg);
 
 	const enc = await security.encrypt(msg);
-	console.log(enc);
+	console.log('Encrypted :', Buffer.toText(enc));
+	
+	const dec = await security.decrypt(enc);
+	console.log('Decrypted :', Buffer.toText(dec));
+	
+	
 }
 
 /**

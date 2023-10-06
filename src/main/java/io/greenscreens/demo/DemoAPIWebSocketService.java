@@ -9,17 +9,14 @@ import jakarta.websocket.server.ServerEndpoint;
 import io.greenscreens.quark.websocket.WebSocketConfigurator;
 import io.greenscreens.quark.websocket.WebSocketService;
 import io.greenscreens.quark.websocket.WebsocketBroadcastEvent;
-import io.greenscreens.quark.websocket.WebsocketDecoder;
 import io.greenscreens.quark.websocket.WebsocketDecoderBinary;
-import io.greenscreens.quark.websocket.WebsocketEncoder;
 import io.greenscreens.quark.websocket.WebsocketEncoderBinary;
 import io.greenscreens.quark.websocket.WebsocketEvent;
 
 @ServerEndpoint(
 		value = DemoURLConstants.WSOCKET,
 		configurator = WebSocketConfigurator.class,
-        decoders = { WebsocketDecoderBinary.class, WebsocketDecoder.class},
-        //encoders = { WebsocketEncoderBinary.class, WebsocketEncoder.class}      
+        decoders = { WebsocketDecoderBinary.class}, 
         encoders = { WebsocketEncoderBinary.class}
 )
 public class DemoAPIWebSocketService extends WebSocketService {
