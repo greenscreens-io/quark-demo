@@ -17,15 +17,15 @@
  *   This engine supports both channels
  */
 
-import { QuarkEngine, Generator, Security, Buffer, Streams, WebChannel } from '/demo/quark.mjs';
+import { QuarkEngine, QuarkGenerator, QuarkSecurity, QuarkBuffer, QuarkStreams, QuarkWebChannel } from '/demo/quark.mjs';
 
 globalThis.QUARK_DEBUG = true;
-globalThis.Generator = Generator;
-globalThis.QuarkEngine = QuarkEngine;
-globalThis.Security = Security;
-globalThis.Buffer = Buffer;  
-globalThis.Streams = Streams;
-globalThis.WebChannel = WebChannel;
+globalThis.Generator = QuarkGenerator;
+globalThis.QuarkEngine = QuarkQuarkEngine;
+globalThis.Security = QuarkSecurity;
+globalThis.Buffer = QuarkBuffer;  
+globalThis.Streams = QuarkStreams;
+globalThis.WebChannel = QuarkWebChannel;
 
 const isSecured = location.protocol === "https:";
 const wsProtocol = isSecured === true ? 'wss' : 'ws';
@@ -39,7 +39,7 @@ const msg = 'This is a test for encrypting đšžćčĐŠŽČ';
  */
 async function test1() {
 
-	const security = await Security.create();
+	const security = await QuarkSecurity.create();
 	const challenge = Date.now();
 	const res = await fetch(api, {
 		method: 'get',
@@ -49,13 +49,13 @@ async function test1() {
 		}
 	});
 	
-	const raw = await WebChannel.fromResponse(res);
+	const raw = await QuarkWebChannel.fromResponse(res);
 	
 	console.log('Decoding GS data');
-	const def = await Streams.unwrap(raw, security, challenge);
+	const def = await QuarkStreams.unwrap(raw, security, challenge);
 	
 	console.log('Building API');
-	const generator = await Generator.build(def.api);
+	const generator = await QuarkGenerator.build(def.api);
 
 	generator.on('call', (o) => {
 		const result = {
@@ -128,7 +128,7 @@ async function test3() {
  */
 async function test4() {
 
-	const security = await Security.create();
+	const security = await QuarkSecurity.create();
 	const challenge = Date.now();
 	const res = await fetch(api, {
 		method: 'get',
@@ -138,8 +138,8 @@ async function test4() {
 		}
 	});
 	
-	const raw = await WebChannel.fromResponse(res);
-	await Streams.unwrap(raw, security, challenge);
+	const raw = await QuarkWebChannel.fromResponse(res);
+	await QuarkStreams.unwrap(raw, security, challenge);
 
 	console.log('Text :', msg);
 
