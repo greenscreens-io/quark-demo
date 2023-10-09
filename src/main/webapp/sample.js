@@ -144,10 +144,10 @@ async function test4() {
 	console.log('Text :', msg);
 
 	const enc = await security.encrypt(msg);
-	console.log('Encrypted :', Buffer.toText(enc));
+	console.log('Encrypted :', QuarkBuffer.toText(enc));
 	
 	const dec = await security.decrypt(enc);
-	console.log('Decrypted :', Buffer.toText(dec));
+	console.log('Decrypted :', QuarkBuffer.toText(dec));
 	
 	
 }
