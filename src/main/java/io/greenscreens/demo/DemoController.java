@@ -36,6 +36,17 @@ public class DemoController {
 		return resp;
 	}
 
+	@ExtJSAsync
+	@ExtJSMethod("helloAsync")
+	public ExtJSResponse helloAsync(@Required final String name) throws Exception {
+		
+		Thread.sleep(TimeUnit.SECONDS.toMillis(4));
+		
+		ExtJSResponse resp = new ExtJSResponse(true, null);
+		resp.setMsg("Hello ".concat(name));
+		return resp;
+	}
+
 	@ExtJSMethod(value = "saveUser", validate = true)
 	public ExtJSObjectResponse<UserModel> save(
 			@NotNull @NotBlank

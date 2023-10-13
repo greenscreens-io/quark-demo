@@ -117,6 +117,9 @@ async function test3() {
 		data = await io.greenscreens.Demo.hello('John Doe');
 		console.log(data);
 	
+		console.log('Calling server async method (wait 4 sec.)...');
+		data = await io.greenscreens.Demo.helloAsync('from server async');
+		console.log(data);
 	} finally {
 		engine.stop();
 	}
@@ -205,6 +208,11 @@ async function test7() {
 	});
 
 	try {
+		
+		console.log('Calling server async method (wait 4 sec.)...');
+		data = await io.greenscreens.Demo.helloAsync('from server async');
+		console.log(data);
+
 		let i = 10;
 		while (i--) {
 			let data = await io.greenscreens.Demo.hello('John Doe call: ' + i);
@@ -228,6 +236,11 @@ async function test8() {
 	});
 
 	try {
+
+		console.log('Calling server async method (wait 4 sec.)...');
+		data = await io.greenscreens.Demo.helloAsync('from server async');
+		console.log(data);
+		
 		let i = 10;
 		while (i--) {
 			const data = await io.greenscreens.Demo.saveUser('John Doe', 'john.doe@acme.com');
