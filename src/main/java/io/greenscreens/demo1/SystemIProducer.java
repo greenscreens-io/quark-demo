@@ -19,7 +19,7 @@ import jakarta.enterprise.inject.spi.InjectionPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.greenscreens.quark.QuarkStorage;
+import io.greenscreens.quark.util.QuarkStorage;
 
 /**
  * Application level instance used to provide AS400 object / httpsession

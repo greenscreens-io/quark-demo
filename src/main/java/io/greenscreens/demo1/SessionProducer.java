@@ -53,7 +53,7 @@ public class SessionProducer implements ServletRequestListener, HttpSessionListe
 
     @Produces @Autoinit
     protected HttpSession getSession() {
-        return QuarkProducer.getWebSession(false);
+        return QuarkProducer.getWebSession();
     }
 
 }

@@ -15,12 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.greenscreens.demo.DemoURLConstants;
-import io.greenscreens.quark.QuarkUtil;
+import io.greenscreens.quark.annotations.ExtJSAction;
+import io.greenscreens.quark.annotations.ExtJSDirect;
+import io.greenscreens.quark.annotations.ExtJSMethod;
 import io.greenscreens.quark.cdi.Required;
 import io.greenscreens.quark.ext.ExtJSResponse;
-import io.greenscreens.quark.ext.annotations.ExtJSAction;
-import io.greenscreens.quark.ext.annotations.ExtJSDirect;
-import io.greenscreens.quark.ext.annotations.ExtJSMethod;
+import io.greenscreens.quark.util.QuarkUtil;
 
 /**
  * Example controller class to work with AS400 object

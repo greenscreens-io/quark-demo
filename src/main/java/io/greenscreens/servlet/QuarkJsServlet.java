@@ -7,6 +7,7 @@
 package io.greenscreens.servlet;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 import jakarta.servlet.annotation.WebServlet;
@@ -46,8 +47,7 @@ public class QuarkJsServlet extends QuarkAPIServlet {
 			return;
 		}
 		
-		final String[] paths = new String[] {path};	
-		build(request, response, paths);	
+		build(request, response, Arrays.asList(path));	
 	}
 
 }

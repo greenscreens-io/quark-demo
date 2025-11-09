@@ -23,9 +23,9 @@ import io.greenscreens.demo1.SystemI;
 import io.greenscreens.demo2.WebFile.TYPE;
 import io.greenscreens.quark.ext.ExtJSResponse;
 import io.greenscreens.quark.ext.ExtJSResponseList;
-import io.greenscreens.quark.ext.annotations.ExtJSAction;
-import io.greenscreens.quark.ext.annotations.ExtJSDirect;
-import io.greenscreens.quark.ext.annotations.ExtJSMethod;
+import io.greenscreens.quark.annotations.ExtJSAction;
+import io.greenscreens.quark.annotations.ExtJSDirect;
+import io.greenscreens.quark.annotations.ExtJSMethod;
 
 /**
  * Example controller class to work with IFS file system

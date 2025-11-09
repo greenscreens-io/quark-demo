@@ -8,19 +8,20 @@ package io.greenscreens.demo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
+import io.greenscreens.quark.annotations.ExtJSAction;
+import io.greenscreens.quark.annotations.ExtJSAsync;
+import io.greenscreens.quark.annotations.ExtJSDirect;
+import io.greenscreens.quark.annotations.ExtJSMethod;
 import io.greenscreens.quark.cdi.Required;
 import io.greenscreens.quark.ext.ExtJSObjectResponse;
 import io.greenscreens.quark.ext.ExtJSResponse;
 import io.greenscreens.quark.ext.ExtJSResponseList;
-import io.greenscreens.quark.ext.annotations.ExtJSAction;
-import io.greenscreens.quark.ext.annotations.ExtJSDirect;
-import io.greenscreens.quark.ext.annotations.ExtJSMethod;
 
 /**
  * Example controller class mapped to JavaScript functions
@@ -37,7 +38,7 @@ public class DemoController {
 	}
 
 	@ExtJSAsync
-	@ExtJSMethod("helloAsync")
+	@ExtJSMethod(value = "helloAsync")
 	public ExtJSResponse helloAsync(@Required final String name) throws Exception {
 		
 		Thread.sleep(TimeUnit.SECONDS.toMillis(4));
