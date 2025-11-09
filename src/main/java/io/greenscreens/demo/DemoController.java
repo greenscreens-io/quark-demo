@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, 2020  Green Screens Ltd.
+ * Copyright (C) 2015, 2025 Green Screens Ltd.
  *
  * https://www.greenscreens.io
  *
@@ -9,6 +9,7 @@ package io.greenscreens.demo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -39,10 +40,11 @@ public class DemoController {
 
 	@ExtJSAsync
 	@ExtJSMethod(value = "helloAsync")
-	public ExtJSResponse helloAsync(@Required final String name) throws Exception {
+	public ExtJSResponse helloAsync(@Required final String name) {
 		
-		Thread.sleep(TimeUnit.SECONDS.toMillis(4));
-		
+		//Thread.sleep(TimeUnit.SECONDS.toMillis(4));
+		LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(4));
+
 		ExtJSResponse resp = new ExtJSResponse(true, null);
 		resp.setMsg("Hello ".concat(name));
 		return resp;

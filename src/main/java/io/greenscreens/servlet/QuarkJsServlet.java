@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, 2020  Green Screens Ltd.
+ * Copyright (C) 2015, 2025 Green Screens Ltd.
  *
  * https://www.greenscreens.io
  *
@@ -7,7 +7,6 @@
 package io.greenscreens.servlet;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
 
 import jakarta.servlet.annotation.WebServlet;
@@ -46,8 +45,8 @@ public class QuarkJsServlet extends QuarkAPIServlet {
 			services(request, response);
 			return;
 		}
-		
-		build(request, response, Arrays.asList(path));	
+			
+		build(request, response, path);	
 	}
 
 }
